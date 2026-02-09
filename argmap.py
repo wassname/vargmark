@@ -204,10 +204,15 @@ def crux_analysis(statements: dict, relations: list) -> list[str]:
 
 
 def propagate_credences(statements: dict, relations: list, data: dict) -> dict[str, dict]:
-    """Propagate credences to compute implied bounds for top-level claims.
+    """Propagate credences to compute implied credence for top-level claims.
 
-    Entailment from A: lower bound = max(A credences)
-    Contrary from B: upper bound = min(1 - B credence)
+    Uses log-odds summation (Bayesian updating) to combine evidence:
+    - Supporting arguments (entails): add log-odds
+    - Contrary arguments: subtract log-odds
+    - Result is converted back to probability via sigmoid
+
+    log_odds(c) = log(c / (1-c))
+    sigmoid(L) = 1 / (1 + exp(-L))
     """
     targets: dict[str, dict] = {}
     for rel in relations:
@@ -216,23 +221,24 @@ def propagate_credences(statements: dict, relations: list, data: dict) -> dict[s
             continue
         to = rel["to"]
         if to not in targets:
-            targets[to] = {"lower": None, "upper": None, "via_entail": [], "via_contrary": []}
-        t = targets[to]
+            targets[to] = {"via_entail": [], "via_contrary": []}
         rtype = rel["relationType"]
         if rtype == "entails":
-            t["via_entail"].append((rel["from"], from_c))
-            t["lower"] = max(t["lower"], from_c) if t["lower"] is not None else from_c
+            targets[to]["via_entail"].append((rel["from"], from_c))
         elif rtype == "contrary":
-            t["via_contrary"].append((rel["from"], from_c))
-            bound = 1.0 - from_c
-            t["upper"] = min(t["upper"], bound) if t["upper"] is not None else bound
+            targets[to]["via_contrary"].append((rel["from"], from_c))
 
     for t in targets.values():
-        lower, upper = t["lower"], t["upper"]
-        if lower is not None and upper is not None:
-            t["implied"] = min(upper, lower)
-        else:
-            t["implied"] = lower or upper
+        # Start from uniform prior (0 log-odds = 50%)
+        log_odds = 0.0
+        for name, c in t["via_entail"]:
+            c_clamped = max(0.001, min(0.999, c))
+            log_odds += math.log(c_clamped / (1 - c_clamped))
+        for name, c in t["via_contrary"]:
+            c_clamped = max(0.001, min(0.999, c))
+            log_odds -= math.log(c_clamped / (1 - c_clamped))
+        t["log_odds"] = log_odds
+        t["implied"] = 1.0 / (1.0 + math.exp(-log_odds))
     return targets
 
 
@@ -243,14 +249,14 @@ def format_propagation(targets: dict[str, dict]) -> list[str]:
         implied = t.get("implied")
         if implied is None:
             continue
-        lines.append(f"  [{title}] implied credence: {implied:.2f}")
+        log_odds = t.get("log_odds", 0.0)
+        lines.append(f"  [{title}] implied credence: {implied:.2f} ({log_odds:+.2f} log-odds)")
         for name, c in t["via_entail"]:
-            lines.append(f"    supported by [{name}] ({c:.2f})")
+            lo = math.log(max(0.001, c) / max(0.001, 1 - c))
+            lines.append(f"    + [{name}] ({c:.2f}, {lo:+.2f} log-odds)")
         for name, c in t["via_contrary"]:
-            lines.append(f"    challenged by [{name}] ({c:.2f}), capped at {(1-c)*100:.0f}%")
-        lower, upper = t.get("lower"), t.get("upper")
-        if lower is not None and upper is not None and lower > upper:
-            lines.append(f"    WARNING: lower ({lower:.2f}) > upper ({upper:.2f}) -- credences in tension!")
+            lo = math.log(max(0.001, c) / max(0.001, 1 - c))
+            lines.append(f"    - [{name}] ({c:.2f}, {lo:+.2f} log-odds)")
     return lines
 
 
@@ -377,49 +383,76 @@ def render_argument(arg_name: str, arg: dict, statements: dict, relations: list[
     lines = [f'<div class="argument" style="border-left: 4px solid {border_color};">']
     lines.append(f'<h3>{escape(arg_name)}</h3>')
 
-    # Premises
+    # Premises: quote-first layout with ACE-inspired labels
     for i, p in enumerate(premises, 1):
         data = p.get("data") or {}
         credence = data.get("credence")
         reason = data.get("reason", "")
         title = p.get("title", "?")
         link_name, link_url = extract_link(p)
-        tags = " ".join(f'<span class="tag">#{t}</span>' for t in p.get("tags", []))
+        tags = p.get("tags", [])
+        is_assumption = "assumption" in tags
 
         lines.append('<div class="premise">')
         lines.append(f'<span class="premise-nr">({i})</span> ')
-        lines.append(f'<strong>{escape(title)}</strong> ')
-        if credence is not None:
-            lines.append(render_credence(credence, "credence", reason))
-        lines.append(f' {tags}')
-        if link_url:
-            display = escape(link_name) if link_name else escape(link_url)
-            lines.append(f'<br><a href="{escape(link_url)}" target="_blank">{display}</a>')
+        if is_assumption:
+            lines.append('<span class="label-assumption">If</span> ')
+        lines.append(f'<strong>{escape(title)}</strong>')
+
+        # Quote first (the evidence)
         quote = extract_quote(p.get("text", ""))
         if quote:
             lines.append(f'<blockquote>"{escape(quote)}"</blockquote>')
+
+        # Source + credence on one line
+        source_parts = []
+        if link_url:
+            display = escape(link_name) if link_name else escape(link_url)
+            source_parts.append(f'<a href="{escape(link_url)}" target="_blank">{display}</a>')
+        if credence is not None:
+            source_parts.append(render_credence(credence, "credence", reason))
+        if source_parts:
+            lines.append(f'<div class="source-line">{" ".join(source_parts)}</div>')
+        elif credence is not None:
+            lines.append(f'<div class="source-line">{render_credence(credence, "credence", reason)}</div>')
         lines.append('</div>')
 
-    # Inference step text (from expanded inference rules on the conclusion)
+    # Inference step text + inference strength (from expanded inference rules on the conclusion)
     for conc in conclusions:
-        inf = conc.get("inference", {})
-        for rule in inf.get("inferenceRules", []):
-            lines.append(f'<div class="inference-step">\u2234 {escape(rule)}</div>')
+        inf_data = conc.get("inference", {})
+        conc_data = conc.get("data") or {}
+        inference_strength = conc_data.get("inference")
+        reason = conc_data.get("reason", "")
+        for rule in inf_data.get("inferenceRules", []):
+            parts = [f'<div class="inference-step">\u2234 {escape(rule)}']
+            if inference_strength is not None:
+                parts.append(f' {render_credence(inference_strength, "inference", reason)}')
+            parts.append('</div>')
+            lines.append("".join(parts))
 
-    # Conclusion
+    # Conclusion with explicit math
     for conc in conclusions:
         data = conc.get("data") or {}
         title = conc.get("title", "?")
         inference = data.get("inference")
-        reason = data.get("reason", "")
         computed = statements.get(title, {}).get("credence")
 
         lines.append('<div class="conclusion">')
+        lines.append(f'<span class="label-conclusion">Then</span> ')
         lines.append(f'<strong>{escape(title)}</strong>: {escape(conc.get("text", ""))}')
-        if inference is not None:
-            lines.append(f'<br>inference: {render_credence(inference, "inference", reason)}')
+        # Show explicit math: premise_credences * inference = computed
         if computed is not None:
-            lines.append(f' \u2192 computed: {render_credence(computed, "computed credence")}')
+            premise_vals = [(p.get("title", "?"), (p.get("data") or {}).get("credence"))
+                           for p in premises if (p.get("data") or {}).get("credence") is not None]
+            if premise_vals and inference is not None:
+                parts_str = " \u00d7 ".join(f"{c:.0%}" for _, c in premise_vals)
+                product = math.prod(c for _, c in premise_vals)
+                lines.append(
+                    f'<br><span class="math">{parts_str} \u00d7 {inference:.0%}'
+                    f' = {render_credence(computed, "computed credence")}</span>'
+                )
+            else:
+                lines.append(f'<br>computed: {render_credence(computed, "computed credence")}')
         if rel_label and rel_target:
             symbol = {"entails": "\u2191", "contrary": "\u2193", "contradictory": "\u2194"}.get(arg_type, "?")
             lines.append(
@@ -475,9 +508,12 @@ h3 {{ color: #0582ca; font-size: 1em; margin-bottom: 0.5em; }}
     border: 1px solid #e0e0e0; border-radius: 6px;
 }}
 .premise {{
-    margin-bottom: 0.8em; padding-left: 2em; text-indent: -2em;
+    margin-bottom: 0.8em; padding-left: 2em;
 }}
 .premise-nr {{ color: #0582ca; font-weight: 600; }}
+.source-line {{ padding-left: 2em; margin-top: 0.2em; font-size: 0.9em; }}
+.label-assumption {{ color: #e68a00; font-weight: 600; font-style: italic; }}
+.label-conclusion {{ color: #0582ca; font-weight: 600; font-style: italic; }}
 .tag {{ color: #66a61e; font-size: 0.85em; }}
 blockquote {{
     margin: 0.5em 0 0.5em 2.5em;
@@ -491,6 +527,7 @@ blockquote {{
     color: #0582ca; font-size: 0.9em; font-style: italic;
 }}
 .conclusion {{ padding: 0.5em; background: #f8f9fa; border-radius: 4px; }}
+.math {{ font-size: 0.9em; color: #555; font-variant-numeric: tabular-nums; }}
 .relation-indicator {{ font-size: 0.85em; font-weight: 600; margin-left: 0.5em; }}
 a {{ color: #0582ca; }}
 .credence {{ font-size: 0.85em; font-variant-numeric: tabular-nums; }}
@@ -510,11 +547,14 @@ details.source-code pre {{
     if bottom_lines:
         html += '<div class="bottom-line">\n<span class="section-label">Bottom line</span>\n'
         for t_title, implied, t in bottom_lines:
-            html += f'<div class="claim">{escape(t_title)}: {render_credence(implied, "implied credence")}</div>\n'
+            log_odds = t.get("log_odds", 0.0)
+            html += f'<div class="claim">{escape(t_title)}: {render_credence(implied, "implied credence")} <span style="font-size:0.8em;color:#888">({log_odds:+.1f} log-odds)</span></div>\n'
             for name, c in t["via_entail"]:
-                html += f'<div class="via">\u2191 supported by {escape(name)} ({c:.2f})</div>\n'
+                lo = math.log(max(0.001, c) / max(0.001, 1 - c))
+                html += f'<div class="via">\u2191 {escape(name)} ({c:.0%}, {lo:+.1f})</div>\n'
             for name, c in t["via_contrary"]:
-                html += f'<div class="via">\u2193 challenged by {escape(name)} ({c:.2f}), capped at {(1-c)*100:.0f}%</div>\n'
+                lo = math.log(max(0.001, c) / max(0.001, 1 - c))
+                html += f'<div class="via">\u2193 {escape(name)} ({c:.0%}, {lo:+.1f})</div>\n'
         html += '</div>\n'
 
     # Arguments grouped by section

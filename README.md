@@ -3,7 +3,8 @@
 
 Structured arguments with credences, real sources, and automated verification. Every claim links to a paper with a quote. Premises get credences, inferences get strength, and conclusions are computed. `just render` verifies and produces enriched HTML.
 
-<!-- TODO: screenshot of rendered argument map here -->
+<!-- TODO: screenshot of rendered argument map here -->alt text](image.png)
+![alt text](image-1.png)
 
 ## Example
 
@@ -34,9 +35,10 @@ model:
     a representation, it is likely encoded explicitly rather than
     requiring nonlinear computation to extract. #assumption
     {credence: 0.65}
-----
-(1) and (2): monotonic separability suggests probes track genuine feature quality
-----
+--
+Monotonic separability suggests probes track genuine feature quality
+{uses: [1, 2]}
+--
 (3) [Probes Valid]: Linear probes reveal genuine structure in
     neural network representations.
     {inference: 0.92}
@@ -56,9 +58,10 @@ model:
     [Belinkov 2022](https://arxiv.org/abs/2102.12452)
     > "recent studies have demonstrated various methodological limitations of this approach"
     {credence: 0.88}
-----
-(1) and (2): high accuracy alone is insufficient evidence of encoding
-----
+--
+High accuracy alone is insufficient evidence of encoding
+{uses: [1, 2]}
+--
 (3) [Probes Mislead]: High probe accuracy may not reliably indicate
     that a representation genuinely encodes a property.
     {inference: 0.51}
@@ -84,11 +87,11 @@ PCS inference strength:
     computed credence: 0.792 * 0.51 = 0.40
 
 Bottom line:
-  [Reliable] implied credence: 0.55
-    supported by [Probes Valid] (0.55)
-    challenged by [Probes Mislead] (0.40), capped at 60%
+  [Reliable] implied credence: 0.64 (+0.59 log-odds)
+    + [Probes Valid] (0.55, +0.20 log-odds)
+    - [Probes Mislead] (0.40, -0.39 log-odds)
 
-Summary: 9 statements, 2 relations, 6 with credences
+Summary: 7 statements, 2 relations, 6 with credences
 ```
 
 ## Writing Arguments
@@ -99,7 +102,7 @@ For the procedural guide (principles, step-by-step, common mistakes), see the [s
 
 1. **Every claim has a source you can click.** Observations link to a paper/URL and include a blockquote of raw text from the source. The premise text provides minimal context; the quote carries the factual weight. If a reader can't verify a premise in 10 seconds, the argument is not trustworthy.
 
-2. **Separate observation from inference from conclusion.** Premises are either sourced facts (`#observation`) or flagged assumptions (`#assumption`). The inference between `----` lines is one sentence. This makes the human's job small: check each one-liner inference step.
+2. **Separate observation from inference from conclusion.** Premises are either sourced facts (`#observation`) or flagged assumptions (`#assumption`). The inference between `--` lines is one sentence. This makes the human's job small: check each one-liner inference step.
 
 3. **Commit to numbers, not vibes.** Premises get `{credence: X}` (how much you trust the source). Conclusions get `{inference: X}` (how strong the reasoning step is). The verifier computes conclusion credence = product(premise credences) * inference strength. Nothing derivable is hardcoded.
 
