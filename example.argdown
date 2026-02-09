@@ -1,121 +1,55 @@
 ===
-title: Should We Deploy the New Scoring Model?
-author: ML Team
+title: Are Linear Probes Reliable for Evaluating Representations?
+author: Deep Research Agent
 model:
     mode: strict
 ===
 
-// Top-level claim with full argument graph
-[Deploy]: We should deploy the new scoring model to production.
-  + <Accuracy Improvement>
-  + <Latency Acceptable>
-  - <Fairness Concern>
-  - <Data Drift Risk>
+// Top-level claim: credence is computed from the arguments below
+[Reliable]: Linear probes are a reliable method for evaluating
+  neural network representations.
+  + <Linear Separability>
+  - <Probe Overfitting>
 
 # Evidence For
 
-<Accuracy Improvement>
+<Linear Separability>
 
-(1) [Benchmark Result]: New model achieves AUC=0.94 vs baseline
-    AUC=0.87 on held-out test set (n=50k, 5-fold CV). #observation
-    [experiment/results.csv](./experiment/results.csv)
-    > "mean AUC 0.937 (95% CI: 0.931-0.943) vs 0.871 (0.863-0.879)"
-    {credence: 0.95, math: "0.937 > 0.871"}
-(2) [Clinical Relevance]: An AUC improvement of 0.07 corresponds
-    to ~12% fewer false negatives at the operating threshold. #observation
-    [experiment/threshold_analysis.py](./experiment/threshold_analysis.py)
-    {credence: 0.85}
-----
-(1) shows statistically significant improvement;
-(2) shows it matters in practice
-----
-(3) [Model Better]: The new model meaningfully outperforms baseline.
-    {credence: 0.80}
-  +> [Deploy]
-
-<Latency Acceptable>
-
-(1) [P99 Latency]: New model P99 latency is 45ms vs SLA of 100ms,
-    tested under 2x peak load. #observation
-    [loadtest/report.html](./loadtest/report.html)
-    {credence: 0.90}
-(2) [Memory]: Peak memory 2.1GB, within the 4GB pod limit. #observation
-    [loadtest/report.html](./loadtest/report.html)
+(1) [Monotonic]: Alain & Bengio 2016 train linear classifier probes
+    on intermediate layers of Inception v3 and ResNet-50. #observation
+    [Alain & Bengio 2016](https://arxiv.org/abs/1610.01644)
+    > "we observe experimentally that the linear separability of features increase monotonically along the depth of the model"
     {credence: 0.92}
+(2) [Linearity Assumption]: If a property is linearly separable in
+    a representation, it is likely encoded explicitly rather than
+    requiring nonlinear computation to extract. #assumption
+    {credence: 0.65}
 ----
-(1) and (2) within operational bounds
+(1) and (2): monotonic separability suggests probes track genuine feature quality
 ----
-(3) [Ops Ready]: The model meets operational requirements.
-    {credence: 0.88}
-  +> [Deploy]
+(3) [Probes Valid]: Linear probes reveal genuine structure in
+    neural network representations.
+    {inference: 0.92}
+  +> [Reliable]
 
 # Evidence Against
 
-<Fairness Concern>
+<Probe Overfitting>
 
-(1) [Disparity]: Model shows 8% TPR gap between demographic
-    groups A and B (p<0.01, n=12k per group). #observation
-    [experiment/fairness_audit.csv](./experiment/fairness_audit.csv)
-    > "Group A TPR=0.91, Group B TPR=0.83, delta=0.08 (p=0.003)"
-    {credence: 0.92}
-(2) [Threshold]: Company policy requires <5% TPR gap for
-    deployment approval. #definition
-    {credence: 0.99}
-----
-(1) exceeds (2): 8% > 5%
-----
-(3) [Fails Fairness]: Model fails the fairness threshold.
-    {credence: 0.91}
-  -> [Deploy]
-
-<Data Drift Risk>
-
-(1) [Distribution Shift]: Training data is from 2024-Q1 to Q3.
-    Feature distributions shifted 15% (PSI) in Q4. #observation
-    [monitoring/drift_report.html](./monitoring/drift_report.html)
+(1) [Control Tasks]: Hewitt & Liang 2019 propose control tasks
+    to test probe selectivity on ELMo representations. #observation
+    [Hewitt & Liang 2019](https://arxiv.org/abs/1909.03368)
+    > "popular probes on ELMo representations are not selective"
+    {credence: 0.90}
+(2) [Limitations Survey]: Belinkov 2022 reviews the probing
+    classifiers methodology. #observation
+    [Belinkov 2022](https://arxiv.org/abs/2102.12452)
+    > "recent studies have demonstrated various methodological limitations of this approach"
     {credence: 0.88}
-(2) [Drift Impact]: PSI > 0.1 historically correlates with >2%
-    AUC degradation within 3 months. #assumption
-    {credence: 0.60}
 ----
-(1) shows drift exists; (2) estimates impact
+(1) and (2): high accuracy alone is insufficient evidence of encoding
 ----
-(3) [May Degrade]: Model accuracy likely to degrade
-    within 3 months without retraining.
-    {credence: 0.55}
-  -> [Deploy]
-
-// Undercut: the drift argument's inference is weak
-<Historical Correlation Weak>
-
-(1) [Small Sample]: The PSI-to-AUC correlation in (2) of
-    Data Drift Risk is based on only 3 prior model versions. #observation
-    [monitoring/historical_models.csv](./monitoring/historical_models.csv)
-    {credence: 0.80}
---
-3 data points is not enough to trust the correlation
---
-(2) [Weak Inference]: The drift impact estimate is unreliable.
-    {credence: 0.70}
-  _> <Data Drift Risk>
-
-# Strict Relations
-
-// These are logical relations, not just support/attack.
-// The verifier checks credence consistency.
-
-[Benchmark Result]
-  +> [Model Better]
-  // entailment: if the benchmark is right, the model is better
-  // VERIFIER CATCHES: credence(Model Better)=0.80 < credence(Benchmark)=0.95
-  // This forces you to either raise Model Better or weaken the entailment
-
-[Fails Fairness]
-  >< [Fairness OK]: Model meets the fairness threshold. {credence: 0.09}
-  // contradiction: exactly one can be true (0.91 + 0.09 = 1.0, OK)
-
-[Model Better]
-  - [Fails Fairness]
-  // contrary: being better overall and failing fairness are in tension
-  // VERIFIER CATCHES: 0.80 + 0.91 = 1.71 > 1.0
-  // You can't be 80% sure it's better AND 91% sure it fails fairness
+(3) [Probes Mislead]: High probe accuracy may not reliably indicate
+    that a representation genuinely encodes a property.
+    {inference: 0.51}
+  -> [Reliable]

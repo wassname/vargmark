@@ -4,3 +4,7 @@ example.json
 example.html
 example.pdf
 argdown.css
+
+__pycache__/
+*.pyc
+*.html
