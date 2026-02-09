@@ -6,7 +6,7 @@ json:
 
 # Verify + render enriched HTML (single step, like quarto render)
 render: json
-    uv run --with sympy --with networkx python render_html.py example.json example_verified.html
+    uv run --with sympy --with networkx python argmap.py example.json example_verified.html
 
 # Render argument map to SVG/PDF (argdown CLI)
 map:
@@ -14,7 +14,3 @@ map:
 
 # Full pipeline
 all: render map
-
-# Just verify (no render, no JSON regen)
-check:
-    uv run --with sympy --with networkx python verify_argdown.py example.json

@@ -24,9 +24,10 @@ model:
     a representation, it is likely encoded explicitly rather than
     requiring nonlinear computation to extract. #assumption
     {credence: 0.65}
-----
-(1) and (2): monotonic separability suggests probes track genuine feature quality
-----
+--
+Monotonic separability suggests probes track genuine feature quality
+{uses: [1, 2]}
+--
 (3) [Probes Valid]: Linear probes reveal genuine structure in
     neural network representations.
     {inference: 0.92}
@@ -46,9 +47,10 @@ model:
     [Belinkov 2022](https://arxiv.org/abs/2102.12452)
     > "recent studies have demonstrated various methodological limitations of this approach"
     {credence: 0.88}
-----
-(1) and (2): high accuracy alone is insufficient evidence of encoding
-----
+--
+High accuracy alone is insufficient evidence of encoding
+{uses: [1, 2]}
+--
 (3) [Probes Mislead]: High probe accuracy may not reliably indicate
     that a representation genuinely encodes a property.
     {inference: 0.51}

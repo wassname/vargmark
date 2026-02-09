@@ -85,8 +85,8 @@ PCS inference strength:
 
 Bottom line:
   [Reliable] implied credence: 0.55
-    via entailment from [Probes Valid] (0.55)
-    bounded by contrary [Probes Mislead] (0.40) -> upper bound 0.60
+    supported by [Probes Valid] (0.55)
+    challenged by [Probes Mislead] (0.40), capped at 60%
 
 Summary: 9 statements, 2 relations, 6 with credences
 ```
@@ -134,8 +134,7 @@ See [justfile](justfile) for all commands. Requires `uv` (for Python deps) and `
 
 ```
 example.argdown        # main example with real sources
-verify_argdown.py      # verifier (credences, math, graph, cruxes, propagation)
-render_html.py         # verify + render enriched HTML (single step)
+argmap.py              # verify + render (single file: credences, math, graph, cruxes, HTML)
 justfile               # repeatable commands
 example.json           # parsed JSON (generated)
 example_verified.html  # enriched HTML (generated)
