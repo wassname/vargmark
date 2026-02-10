@@ -1,9 +1,8 @@
 
 # Verified Argument Maps
 
-Structured arguments with credences, real sources, and automated verification. Every claim links to a paper with a quote. Premises get credences, inferences get strength, and conclusions are computed. `just render` verifies and produces enriched HTML.
+Have your LLM ourput a structured argument, that is easy to verify.
 
-<!-- TODO: screenshot of rendered argument map here -->alt text](image.png)
 ![alt text](image-1.png)
 
 ## Example
