@@ -1,0 +1,166 @@
+===
+title: Is Intermittent Fasting Better Than Caloric Restriction for Longevity?
+author: Skill Doc Test Agent
+model:
+    mode: strict
+===
+
+// Pattern 8: Pro/Con Map (universal skeleton)
+
+[IF Superior]: Intermittent fasting is superior to continuous caloric restriction for extending human lifespan.
+  + <Autophagy Mechanism>
+  + <Circadian Alignment>
+  - <Meta-Analysis Equivalence>
+  - <Adherence Problem>
+  - <No Direct Longevity Data>
+
+// Pattern 6: Sub-Question Decomposition
+// Decompose the main question into independent cruxes
+
+[Mechanism Independent]: IF activates longevity pathways independent of calorie reduction. #crux
+  + [IF Superior]
+
+[Adherence Feasible]: IF is at least as adhereable as CR long-term. #crux
+  + [IF Superior]
+
+[Clinical Outcomes]: IF produces better clinical biomarkers of aging than CR. #crux
+  + [IF Superior]
+
+
+// ============================================
+// PRO ARGUMENTS
+// ============================================
+
+// Pattern 2: Evidence Chain -- autophagy mechanism argument
+
+<Autophagy Mechanism> #pro
+
+(1) [IF Triggers Autophagy]: de Cabo and Mattson 2019 found that fasting periods activate cellular cleanup via mTOR suppression. #observation
+    > "Intermittent fasting stimulates autophagy and mitophagy while inhibiting the mTOR (mammalian target of rapamycin) protein-synthesis pathway."
+    [de Cabo & Mattson 2019, NEJM](https://doi.org/10.1056/NEJMra1905136)
+    {credence: 0.90, reason: "NEJM review, 600+ citations, authoritative"}
+(2) [AMPK Drives Autophagy]: AMPK activation under nutrient deprivation directly phosphorylates ULK1 and suppresses mTORC1, initiating autophagy. #observation
+    > "AMPK directly phosphorylates ULK, which is a process that is required for ULK1 activation and the initiation of autophagy under nutrient deprivation conditions."
+    [Aman et al. 2021, Ageing Research Reviews](https://doi.org/10.1016/j.arr.2021.101400)
+    {credence: 0.85, reason: "well-cited review of established molecular pathway"}
+(3) [CR Lacks Cycling]: Continuous CR does not produce the same fed/fasted cycling that drives periodic mTOR suppression. #assumption
+    {credence: 0.55, reason: "plausible but not directly tested in humans"}
+----
+(4) IF may activate autophagy pathways more strongly than CR due to periodic deep fasting.
+    {inference: 0.50}
+  +> [Mechanism Independent]
+
+
+// Pattern 2: Evidence Chain -- circadian alignment
+
+<Circadian Alignment> #pro
+
+(1) [TRF Circadian]: Longo and Panda 2016 reviewed that time-restricted feeding aligns food intake with circadian metabolic rhythms. #observation
+    > "The improvements are attributed to weight loss, reduced inflammation, and alterations in circadian rhythms that favor metabolic health."
+    [Longo & Panda 2016, Cell Metabolism](https://doi.org/10.1016/j.cmet.2016.06.001)
+    {credence: 0.80, reason: "highly cited Cell Metabolism review"}
+(2) [Metabolic Switch]: de Cabo and Mattson 2019 describe a metabolic switch from glucose to ketone-based energy during fasting windows. #observation
+    > "Evidence is accumulating that eating in a 6-hour period and fasting for 18 hours can trigger a metabolic switch from glucose-based to ketone-based energy."
+    [de Cabo & Mattson 2019, NEJM](https://doi.org/10.1056/NEJMra1905136)
+    {credence: 0.85, reason: "NEJM review, mechanism well-characterized in animal models"}
+----
+(3) Time-restricted eating provides circadian and metabolic switching benefits that continuous CR does not. 
+    {inference: 0.45}
+  +> [IF Superior]
+
+
+// ============================================
+// CON ARGUMENTS
+// ============================================
+
+// Pattern 2: Evidence Chain -- meta-analysis shows equivalence
+
+<Meta-Analysis Equivalence> #con
+
+(1) [Isocaloric Meta]: Hamsho et al. 2025 meta-analysis of 20 RCTs found isocaloric IF is not superior to CR on health outcomes. #observation
+    > "Isocaloric intermittent fasting (IF) is not superior to calorie restriction (CR) in enhancing health outcomes in adults and the elderly."
+    [Hamsho et al. 2025, NMCD](https://doi.org/10.1016/j.numecd.2024.103805)
+    {credence: 0.85, reason: "systematic review and meta-analysis of 20 RCTs, GRADE assessment"}
+(2) [Benefits CR Dependent]: The same meta-analysis concluded IF benefits are mediated by the caloric deficit, not fasting per se. #observation
+    > "The health benefits induced by intermittent fasting are calorie restriction dependent."
+    [Hamsho et al. 2025, NMCD](https://doi.org/10.1016/j.numecd.2024.103805)
+    {credence: 0.80, reason: "same source, direct conclusion from the meta-analysis"}
+----
+(3) When calories are matched, IF provides no additional health benefit over CR.
+    {inference: 0.80}
+  -> [IF Superior]
+
+
+// Pattern 3: Undercut -- meta-analysis undercuts the autophagy mechanism argument
+
+<Mechanism Not Proven In Humans> #con
+
+(1) [Animal Only]: Most autophagy-longevity evidence comes from yeast, worms, and mice, not human lifespan studies. #assumption
+    {credence: 0.80, reason: "well-known translational gap in aging research"}
+(2) [Isocaloric Meta]
+----
+(3) Even if IF activates autophagy more than CR, the RCT evidence shows this does not translate to superior health outcomes.
+    {inference: 0.70}
+  _> <Autophagy Mechanism>
+
+
+// Pattern 2: Evidence Chain -- adherence problem
+
+<Adherence Problem> #con
+
+(1) [ADF Dropout]: Trepanowski et al. 2017 RCT found alternate-day fasting had a 38% dropout rate vs 29% for daily caloric restriction. #observation
+    > "The dropout rate was highest in the alternate-day fasting group (13 of 34, 38%), relative to the daily calorie restriction group (10 of 35, 29%)."
+    [Trepanowski et al. 2017, JAMA Internal Medicine](https://doi.org/10.1001/jamainternmed.2017.0936)
+    {credence: 0.80, reason: "12-month RCT published in JAMA, though small sample"}
+(2) [Effective Only If Sustained]: Any longevity intervention requires decades of adherence to produce lifespan effects. #assumption
+    {credence: 0.90, reason: "obvious requirement for chronic intervention"}
+----
+(3) Higher dropout rates undermine IF's real-world longevity benefit relative to CR.
+    {inference: 0.65}
+  -> [Adherence Feasible]
+
+
+// Pattern 2: Evidence Chain -- no direct longevity data
+
+<No Direct Longevity Data> #con
+
+(1) [CALERIE Biomarkers]: The CALERIE trial showed 25% CR (achieved ~12%) improved aging biomarkers over 2 years, but did not measure actual lifespan. #observation
+    > "The CALERIE trial randomized N = 220 nonobese adults to 25% caloric restriction (n = 145; 11.7% caloric restriction was achieved, on average)."
+    [Belsky et al. 2017, J Gerontol](https://doi.org/10.1093/gerona/glx146)
+    {credence: 0.85, reason: "large well-designed RCT, 214 citations"}
+(2) [No IF Lifespan Trial]: No RCT has measured the effect of IF on human lifespan or even multi-year mortality. #observation
+    > "Due to the low number of long-term studies, future studies should focus on conducting longitudinal randomized trials comparing IF and CR."
+    [Hamsho et al. 2025, NMCD](https://doi.org/10.1016/j.numecd.2024.103805)
+    {credence: 0.90, reason: "explicit limitation acknowledged by meta-analysis authors"}
+----
+(3) Neither IF nor CR has direct human lifespan evidence; the question cannot be definitively answered.
+    {inference: 0.85}
+  -> [IF Superior]
+
+
+// ============================================
+// Pattern 10: Correlated Arguments
+// The two pro mechanistic arguments share an evidence base
+// ============================================
+
+// Tagged above: <Autophagy Mechanism> and <Circadian Alignment> both rely on
+// the same animal model / mechanistic review literature (de Cabo & Mattson 2019).
+// A reader should not count them as fully independent lines of evidence.
+// Note: #cluster-mechanism tag would go on both arguments in practice,
+// but the correlated evidence base is the de Cabo & Mattson 2019 review.
+
+
+// ============================================
+// Pattern 7: Synthesis / Aggregation -- bottom line
+// ============================================
+
+<Bottom Line>
+
+(1) [Mechanism Independent]
+(2) [Adherence Feasible]
+(3) [Clinical Outcomes]
+--
+Weighing: mechanism plausible but unproven in humans, adherence worse for IF, clinical outcomes equivalent when calories matched. {uses: [1, 2, 3]}
+--
+(4) [Verdict]: IF is a viable alternative to CR but current evidence does not support it being superior for human longevity. The apparent benefits of IF are primarily mediated by caloric restriction itself.
+    {inference: 0.70}
