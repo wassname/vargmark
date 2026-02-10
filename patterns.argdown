@@ -1,0 +1,201 @@
+===
+title: Structural Patterns in Verified Argument Maps
+author: Extracted from 4 explore files
+date: 2026-02-10
+abstract: >
+  Minimal examples of each distinct argument structure that emerged
+  when agents used strict argdown for different task types (deep research,
+  superforecasting, normative/policy, technical prediction).
+model:
+  mode: strict
+===
+
+// ============================================================
+// PATTERN 1: Sourced Premise (universal building block)
+// All 4 agents converged on this exact pattern.
+// ============================================================
+
+# Pattern 1: Sourced Premise
+
+// The atomic unit. A claim backed by a quote, link, and credence.
+// #observation = sourced fact. #assumption = unsourced belief.
+
+[Sycophancy]: Sharma et al. 2023 found five AI assistants
+consistently exhibit sycophancy across four tasks. #observation
+  > "sycophancy is a general behavior of state-of-the-art AI
+  > assistants, likely driven in part by human preference judgments
+  > favoring sycophantic responses"
+  [Sharma et al. 2023](https://arxiv.org/abs/2310.13548)
+  {credence: 0.90, reason: "Anthropic, 5 models, peer reviewed"}
+
+
+// ============================================================
+// PATTERN 2: Simple Evidence Chain (from LLM morality)
+// Premises -> inference bar -> conclusion -> relation to claim
+// ============================================================
+
+# Pattern 2: Evidence Chain
+
+[Claim A]: LLMs have coherent moral reasoning.
+
+<Evidence Against A>
+
+(1) [Sycophancy]
+(2) [Perspective Flip]: Nunes et al. 2024 showed GPT-4 argues for
+    conflicting positions from 1st vs 3rd person perspective. #observation
+    > "Hypocritical behaviour seems to provide evidence that a given
+    > LLM is not properly aligned"
+    [Nunes et al. 2024, AAAI](https://arxiv.org/abs/2405.11100)
+    {credence: 0.75, reason: "Tested GPT-4, Claude 2.1; some models failed"}
+----
+(3) LLM moral positions shift with interlocutor and perspective.
+    {inference: 0.80}
+  -> [Claim A]
+
+
+// ============================================================
+// PATTERN 3: Undercut (from scaling laws, AI pause, taiwan)
+// Attacks the INFERENCE STEP not the premises.
+// "Even if your premises are true, your conclusion doesn't follow."
+// ============================================================
+
+# Pattern 3: Undercut
+
+[Scaling Continues]: Scaling laws hold for 3 more OOM.
+
+<Synthetic Data Fix>: Synthetic data can replace human data. #pro
+
+(1) [Synth Works]: RL from verifiable rewards improved math
+    to 97.3% on MATH-500 without more human data. #observation
+    {credence: 0.75}
+----
+(2) Synthetic data relaxes the data constraint.
+    {inference: 0.60}
+  + [Scaling Continues]
+
+// Model collapse undercuts the INFERENCE (synthetic -> fix),
+// not the premise (synth works in some cases).
+<Model Collapse>: Recursive training on own outputs degrades
+quality, limiting synthetic data as a substitute. #con
+
+(1) [Collapse]: Shumailov et al. 2024 showed model collapse
+    from recursive self-training. #observation
+    > "Model collapse is a degenerative process affecting generations
+    > of learned generative models"
+    [Shumailov et al. 2024, Nature](https://www.nature.com/articles/s41586-024-07566-y)
+    {credence: 0.85}
+----
+(2) Naive synthetic data scaling degrades quality.
+    {inference: 0.80}
+  _> <Synthetic Data Fix>
+
+
+// ============================================================
+// PATTERN 4: Contradiction (from AI pause)
+// Two claims that CANNOT both be fully true.
+// Good for genuine value tensions in policy arguments.
+// ============================================================
+
+# Pattern 4: Contradiction
+
+[Risk Real]: The probability of AI catastrophe is >= 5%. #observation
+  {credence: 0.70}
+
+[Opportunity Cost]: Pausing delays millions of QALYs in
+  medical progress per year. #assumption
+  {credence: 0.70}
+
+// These are genuinely in tension: you can't fully weight both.
+[Risk Real]
+  >< [Opportunity Cost]
+
+
+// ============================================================
+// PATTERN 5: Multi-Step Inference (from AI pause)
+// Chain of reasoning with intermediate conclusions.
+// ============================================================
+
+# Pattern 5: Multi-Step Inference
+
+<Recursive Takeoff>
+
+(1) [No Ceiling]: There is no fundamental barrier at human
+    level -- AI can be copied, run faster, use more compute. #observation
+    > "There is no fundamental reason why AI progress would slow
+    > or halt when it reaches human-level abilities."
+    [Bengio et al. Science 2024](https://doi.org/10.1126/science.adn0117)
+    {credence: 0.85}
+(2) [Self Improve]: A capable enough AI could improve its own
+    training pipeline. #assumption
+    {credence: 0.50, reason: "theoretical, no empirical examples of full recursive loop"}
+----
+(3) Recursive self-improvement could produce rapid capability gain.
+    {inference: 0.40}
+(4) [Narrow Window]: The intervention window between slightly
+    and far superhuman may be very short. #assumption
+    {credence: 0.35}
+----
+(5) A pause gives safety margin before recursive takeoff.
+    {inference: 0.30}
+
+
+// ============================================================
+// PATTERN 6: Sub-Question Decomposition (from scaling laws)
+// Main claim breaks into independent sub-questions.
+// Each sub-question gets its own evidence group.
+// ============================================================
+
+# Pattern 6: Sub-Question Decomposition
+
+[Main Q]: Scaling laws hold to 10^29 FLOP.
+
+// Each crux is an independent sub-question that could break the main claim
+[Data Wall]: Data runs out before 10^29 FLOP. #crux
+  - [Main Q]
+
+[Energy Wall]: Energy costs become prohibitive. #crux
+  - [Main Q]
+
+[Loss Not Capability]: Loss drops but capabilities plateau. #crux
+  - [Main Q]
+
+// Then each sub-question gets its own PCS arguments...
+
+
+// ============================================================
+// PATTERN 7: Synthesis / Aggregation (all 4 agents, varied)
+// Pulls conclusions from multiple arguments into a bottom line.
+// ============================================================
+
+# Pattern 7: Synthesis
+
+<Bottom Line>
+
+(1) [Risk Real]
+(2) [Opportunity Cost]
+(3) [Narrow Window]
+--
+Weighing pro and con arguments {uses: [1, 2, 3]}
+--
+(4) [Verdict]: The risk concern is real but the specific
+    mechanism (hard pause at 150%) is inferior to graduated
+    governance. The spirit is sound; the letter is not.
+    {inference: 0.55}
+
+
+// ============================================================
+// PATTERN 8: Pro/Con Top-Level Map (all 4 agents)
+// The universal skeleton: claim + supporting + attacking arguments.
+// ============================================================
+
+# Pattern 8: Pro/Con Map (the skeleton)
+
+// Every agent used this top-level structure regardless of task type.
+// [Thesis]
+//   + <Pro Argument 1>
+//   + <Pro Argument 2>
+//   - <Con Argument 1>
+//   - <Con Argument 2>
+//
+// Then each <Argument> expands into a PCS (Pattern 2) with
+// sourced premises (Pattern 1) and inference bars.

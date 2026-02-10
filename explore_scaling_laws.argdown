@@ -1,0 +1,532 @@
+===
+title: Will Scaling Laws Continue for 3 More OOM of Compute?
+subTitle: Analyzing whether LLM scaling laws hold to ~10^29 FLOP training runs
+author: Research Agent
+date: 2026-02-10
+abstract: >
+  An argument map analyzing whether the power-law relationship between
+  training compute and LLM loss will continue to hold for another 3 orders
+  of magnitude (from ~10^26 to ~10^29 FLOP). Decomposes the question into
+  sub-problems: data availability, energy/hardware feasibility, theoretical
+  grounding, and the gap between loss improvement and capability gains.
+
+model:
+  mode: strict
+
+map:
+  statementLabelMode: text
+  argumentLabelMode: title
+  groupDepth: 3
+
+color:
+  tagColors:
+    observation: "#2196F3"
+    assumption: "#FF9800"
+    pro: "#4CAF50"
+    con: "#f44336"
+    clarification: "#9C27B0"
+    crux: "#E91E63"
+===
+
+# Main Thesis
+
+[ScalingContinues]: Pre-training scaling laws for LLMs (power-law relationship
+between compute and loss) will continue to hold for approximately 3 more
+orders of magnitude of compute, i.e. to ~10^29 FLOP training runs. #crux
+
+// The resolution depends on several sub-questions interacting.
+// Loss may keep falling but capabilities may plateau on benchmarks,
+// data may run out, or energy costs may become prohibitive.
+
+# Historical Evidence {isGroup: true}
+
+## Empirical track record
+
+<KaplanPowerLaw>: Kaplan et al. observed smooth power-law scaling of
+test loss across 7+ OOM of compute, establishing the core empirical
+regularity. #pro
+  + [ScalingContinues]
+
+<KaplanPowerLaw>
+
+(1) [KaplanObs]: Kaplan et al. (2020) trained transformers from 768 to
+1.5B parameters and found test loss follows L(C) = (C\_0/C)^alpha\_C
+with alpha\_C of about 0.050 across many OOM. #observation
+  > "The test loss of a Transformer trained to autoregressively model
+  language can be predicted using a power-law when performance is limited
+  by only either the number of non-embedding parameters N, the dataset
+  size D, or the optimally allocated compute budget C\_min."
+  [Kaplan et al., Scaling Laws for Neural Language Models](https://arxiv.org/abs/2001.08361)
+  {credence: 0.92, reason: "Seminal paper, widely replicated, but fit over limited range (7 OOM) and later revised by Chinchilla"}
+(2) [ShapeInsensitivity]: Performance depends very weakly on model shape
+(depth/width ratio, attention heads) when total parameters are fixed. #observation
+  > "A wide range of architectures achieve similar performance. 22%
+  additional compute compensates for 1% loss increase."
+  [Kaplan et al., 2020](https://arxiv.org/abs/2001.08361)
+  {credence: 0.85, reason: "Tested over limited architecture space, but confirmed by later work"}
+----
+(3) The power-law in compute is a robust empirical regularity, not an
+artifact of a specific architecture choice.
+  +> [ScalingContinues]
+
+<ChinchillaRevision>: Hoffmann et al. revised Kaplan's scaling exponents
+but confirmed the power-law form holds. #pro
+  + [ScalingContinues]
+
+<ChinchillaRevision>
+
+(1) [ChinchillaObs]: Hoffmann et al. (2022) trained 400+ models from
+70M to 16B parameters and found model size and data should scale roughly
+equally with compute, revising Kaplan's parameter-heavy recommendation. #observation
+  > "For every doubling of model size, the number of training tokens
+  should also double... an approximate ratio of 20 training tokens per
+  model parameter is ideal."
+  [Hoffmann et al., Training Compute-Optimal Large Language Models](https://arxiv.org/abs/2203.15556)
+  {credence: 0.90, reason: "Peer reviewed, 400+ models, but exact exponents debated in follow-up work (Hagele et al. 2024)"}
+(2) [PowerLawForm]: Despite different exponents, both Kaplan and Chinchilla
+find the same functional form: L(N,D) = E + A/N^alpha + B/D^beta. #observation
+  {credence: 0.88, reason: "Two independent groups at different labs found the same form"}
+----
+(3) The power-law functional form is robust across independent investigations.
+  +> [ScalingContinues]
+
+<CrossDomainScaling>: Power-law scaling holds across multiple domains,
+not just language. #pro
+  + [ScalingContinues]
+
+<CrossDomainScaling>
+
+(1) [HestnessObs]: Hestness et al. (2017) found power-law learning curves
+across image classification, neural machine translation, speech, and
+language modeling. #observation
+  > "Power-law learning curves exist across all applications, model
+  architectures, optimizers, and loss functions."
+  [Hestness et al., Deep Learning Scaling is Predictable, Empirically](https://arxiv.org/abs/1712.00409)
+  {credence: 0.85, reason: "Large-scale empirical study from Baidu, pre-dates modern LLMs but core finding replicated"}
+(2) [CrossDomainObs]: Scaling laws with similar functional forms have been
+found in vision (ViT scaling), protein folding, code generation, and
+multimodal models. #observation
+  {credence: 0.80, reason: "Multiple independent confirmations, but exponents differ across domains"}
+----
+(3) Power-law scaling appears to be a general property of deep learning,
+not specific to language.
+  +> [ScalingContinues]
+
+## Current frontier {isGroup: true}
+
+<ComputeTrend>: Training compute for frontier models has been growing at
+~4-5x/year, putting 10^29 FLOP within reach by ~2029-2030. #pro
+  + [ScalingContinues]
+
+<ComputeTrend>
+
+(1) [EpochTrend]: Epoch AI reports frontier training compute has grown at
+~4.5x per year since 2020. As of early 2025, frontier closed models are
+at ~10^26 FLOP (e.g. GPT-4 class ~2e25, Grok-3 / GPT-4.5 class ~1e26). #observation
+  > "The training compute of frontier AI models has grown by 5x per year
+  since 2020."
+  [Epoch AI, Trends in Training Compute](https://epoch.ai)
+  {credence: 0.88, reason: "Epoch AI is the standard source for compute tracking, methodology is transparent and peer-reviewed"}
+(2) [GrowthAssumption]: At 4.5x/year, reaching 10^29 from 10^26 takes
+about 4.3 years, i.e. ~2029-2030. #assumption
+  {credence: 0.55, reason: "Assumes current growth rate persists, but energy, chip supply, and cost may slow it"}
+----
+(3) The compute to reach 10^29 FLOP is plausibly available within 5 years
+at current growth rates.
+  +> [ScalingContinues]
+
+
+# The Data Wall {isGroup: true}
+
+[DataWall]: Training data availability will become a binding constraint
+before 10^29 FLOP, breaking the scaling law or forcing a change in
+training methodology. #crux
+  - [ScalingContinues]
+
+<DataScarcity>: Human-generated text data is finite and will be exhausted
+at current scaling rates. #con
+  + [DataWall]
+
+<DataScarcity>
+
+(1) [VillalobosEstimate]: Epoch AI (Villalobos et al., 2024) estimates
+~300 trillion tokens of usable human-generated public text (90% CI: 100T
+to 1000T). With compute-optimal training, this stock supports up to
+~5e28 FLOP before exhaustion (expected ~2028). #observation
+  > "We estimate the effective stock of quality and repetition adjusted
+  human-generated public text for AI training at around 300 trillion
+  tokens. If trends continue, language models will fully utilize this
+  stock between 2026 and 2032."
+  [Villalobos et al., Will we run out of data?](https://epoch.ai/blog/will-we-run-out-of-data-limits-of-llm-scaling-based-on-human-generated-data)
+  {credence: 0.82, reason: "Peer-reviewed at ICML 2024, transparent methodology, but stock estimates have shifted 5x between 2022 and 2024 revisions"}
+(2) [OvertrainingPressure]: Labs like Meta already overtrain models by 10x
+(Llama 3). If overtraining factors reach 100x, data exhaustion could
+arrive years earlier. #observation
+  > "Meta's Llama 3 was overtrained by a factor of ten. If other labs
+  move toward overtraining factors of one hundred, the data could run
+  out as early as 2025."
+  [Epoch AI / Villalobos analysis](https://epoch.ai/blog/will-we-run-out-of-data-limits-of-llm-scaling-based-on-human-generated-data)
+  {credence: 0.75, reason: "Overtraining factors are a real practice, but 100x is speculative"}
+----
+(3) Human text data runs out around 5e28 FLOP, which is below the 10^29
+target and would break compute-optimal scaling.
+  + [DataWall]
+
+<SutskeversWarning>: Ilya Sutskever, co-founder of OpenAI, publicly warned
+that pre-training as we know it will end. #con
+  + [DataWall]
+
+<SutskeversWarning>
+
+(1) [SutskeversQuote]: At NeurIPS 2024, Sutskever declared the end of the
+pre-training paradigm due to data exhaustion. #observation
+  > "Pre-training as we know it will unquestionably end. We've achieved
+  peak data and there'll be no more."
+  [Sutskever, NeurIPS 2024, via Reuters](https://www.reuters.com/technology/artificial-intelligence/ai-with-reasoning-power-will-be-less-predictable-ilya-sutskever-says-2024-12-14/)
+  {credence: 0.70, reason: "Sutskever has deep insider knowledge, but this is a directional claim, not a quantitative one. He may be referring to the paradigm changing, not scaling laws breaking."}
+----
+(2) An insider with exceptional track record believes the current
+pre-training paradigm is near its end.
+  + [DataWall]
+  _> <KaplanPowerLaw>
+
+// But several counter-arguments suggest the data wall can be circumvented.
+
+<SyntheticDataWorkaround>: Synthetic data generation can extend the
+effective data supply. #pro
+  - [DataWall]
+
+<SyntheticDataWorkaround>
+
+(1) [SyntheticSuccess]: Inference-time compute can generate high-entropy
+synthetic training data. Sutskever himself suggested this cycle:
+train model, generate synthetic data via scaled inference, train further. #observation
+  > "Imagine a cycle of training a model, generating high-entropy
+  synthetic data by scaling inference compute, and then using that
+  data to continue."
+  [Summary of Sutskever NeurIPS 2024 talk](https://www.reddit.com/r/singularity/comments/1hdrjvq/ilyas_full_talk_at_neurips_2024_pretraining_as_we/)
+  {credence: 0.55, reason: "Conceptually plausible but unproven at scale. No published evidence that synthetic-data loops sustain power-law scaling."}
+(2) [RLSuccess]: Reinforcement learning from verifiable rewards (math,
+code) has demonstrably improved capabilities without more human data.
+DeepSeek-R1 achieves 97.3% on MATH-500 using RL. #observation
+  {credence: 0.75, reason: "RL for verifiable domains is well-established, but unclear if it generalizes to all capabilities"}
+----
+(3) Synthetic data and RL can partially substitute for human data,
+relaxing the data constraint.
+  -> [DataWall]
+
+<ModelCollapseRisk>: Training on synthetic data risks model collapse,
+limiting how much synthetic data can substitute for human data. #con
+  _> <SyntheticDataWorkaround>
+
+<ModelCollapseRisk>
+
+(1) [CollapseEvidence]: Shumailov et al. (2024) in Nature showed that
+models trained recursively on their own outputs undergo progressive
+quality degradation (model collapse). #observation
+  > "Model collapse is a degenerative process affecting generations of
+  learned generative models, in which the data they generate end up
+  polluting the training set of the next generation."
+  [Shumailov et al., AI models collapse when trained on recursively generated data, Nature 2024](https://www.nature.com/articles/s41586-024-07566-y)
+  {credence: 0.85, reason: "Published in Nature, rigorous experimental setup, but tested on smaller models. Real-world pipelines may use verification/filtering to mitigate."}
+----
+(2) Naive synthetic data scaling will degrade model quality, limiting
+its effectiveness as a data substitute.
+  _> <SyntheticDataWorkaround>
+
+<MultimodalDataExpansion>: Incorporating video, audio, and image data
+massively expands the available training data pool. #pro
+  - [DataWall]
+
+<MultimodalDataExpansion>
+
+(1) [VideoDataStock]: Video data (YouTube alone has 800M+ videos) contains
+orders of magnitude more bits than text. Even accounting for redundancy,
+multimodal data could extend effective training data by 1-2 OOM. #assumption
+  {credence: 0.60, reason: "Video data exists in vast quantities, but converting it to useful training signal for language capabilities is unproven at this scale"}
+(2) [MultimodalModels]: Frontier labs (Google, OpenAI, Meta) are already
+training multimodal models on text + image + video + audio. #observation
+  {credence: 0.85, reason: "GPT-4o, Gemini 2.0, etc. are publicly multimodal"}
+----
+(3) Multimodal data can extend the effective data supply by 1-2 OOM,
+potentially enough to reach 10^29 FLOP.
+  -> [DataWall]
+
+<MultiEpochTraining>: Models can train on the same data multiple times
+without catastrophic degradation. #pro
+  - [DataWall]
+
+<MultiEpochTraining>
+
+(1) [EpochsWork]: Muennighoff et al. (2023) showed models can train for
+several epochs (up to 4-16x) with limited degradation, effectively
+multiplying the data stock by 2-5x. #observation
+  > "Models can be trained on several epochs without significant
+  degradation... this further expanded our estimate of the effective
+  stock by a factor of 2-5x."
+  [Epoch AI summary of Muennighoff et al., 2023](https://epoch.ai/blog/will-we-run-out-of-data-limits-of-llm-scaling-based-on-human-generated-data)
+  {credence: 0.80, reason: "Published and incorporated into Epoch AI's revised estimates"}
+----
+(2) Multi-epoch training extends the effective data stock, but by a
+constant factor (2-5x), not by OOM.
+  -> [DataWall]
+  _> <DataScarcity>
+
+
+# Energy and Hardware Constraints {isGroup: true}
+
+[EnergyCrunch]: Energy and hardware constraints will prevent reaching
+10^29 FLOP training runs. #crux
+  - [ScalingContinues]
+
+<PowerDemand>: Training at 10^29 FLOP requires power approaching GW
+scale, straining grid capacity. #con
+  + [EnergyCrunch]
+
+<PowerDemand>
+
+(1) [EnergyGrowth]: Epoch AI reports training energy demands are doubling
+annually. A 2025 report found the high end for a single frontier model
+approaching 1% of total US power capacity. #observation
+  > "The energy demands of training cutting-edge AI models are doubling
+  annually, soon rivaling the output of the largest nuclear power plants."
+  [Jaime Sevilla, Epoch AI, via Axios 2025](https://www.axios.com/2025/08/12/ai-training-power-needs)
+  {credence: 0.80, reason: "Epoch AI is credible, but energy efficiency gains in hardware could partially offset"}
+(2) [CurrentPower]: A specific frontier model in 2025 required ~25 MW
+total power draw for training. At 1000x more compute, naive scaling
+suggests ~25 GW, which is ~2% of US generation capacity. #assumption
+  {credence: 0.50, reason: "Naive linear extrapolation ignores hardware efficiency gains (FLOP/watt improves ~2x every 2-3 years)"}
+----
+(3) Training at 10^29 FLOP may require GW-scale power for a single run.
+  + [EnergyCrunch]
+
+<HardwareEfficiency>: Hardware FLOP/watt efficiency is improving, reducing
+the energy cost per FLOP. #pro
+  - [EnergyCrunch]
+
+<HardwareEfficiency>
+
+(1) [MooresLaw]: GPU/accelerator efficiency has historically improved at
+roughly 2x FLOP/watt every 2-3 years (e.g. H100 vs A100 vs V100). #observation
+  {credence: 0.80, reason: "Well-documented hardware trend, though gains may slow as Moore's law decelerates"}
+(2) [InvestmentScale]: AI infrastructure investment is projected at $300B+
+in 2025, with massive data center buildouts by Microsoft, Google, Amazon,
+and Meta. Total US AI power is projected at 50 GW by 2030. #observation
+  > "Total U.S. power needed to serve AI is estimated at 50 GW in 2030,
+  a huge uptick from 5 GW today."
+  [Axios, AI training power needs, 2025](https://www.axios.com/2025/08/12/ai-training-power-needs)
+  {credence: 0.75, reason: "Industry projections, but actual buildout faces permitting, grid, and political constraints"}
+----
+(3) Hardware efficiency gains and massive investment partially offset
+the energy challenge, but may not fully close the gap for 10^29 FLOP
+single-model training.
+  -> [EnergyCrunch]
+
+
+# Algorithmic Efficiency {isGroup: true}
+
+<AlgorithmicProgress>: Algorithmic improvements provide additional
+effective compute, supplementing raw hardware scaling. #pro
+  + [ScalingContinues]
+
+<AlgorithmicProgress>
+
+(1) [HoErdilObs]: Ho, Besiroglu et al. (2024) found compute efficiency
+for language models halves every ~8 months (95% CI: 5-14 months). Over
+2012-2023, algorithmic improvements yielded a 22,000x compute-equivalent
+gain. #observation
+  > "The compute required to reach a set performance threshold has halved
+  approximately every 8 months, with a 95% confidence interval of around
+  5 to 14 months, substantially faster than hardware gains per Moore's Law."
+  [Ho et al., Algorithmic Progress in Language Models, 2024](https://arxiv.org/abs/2403.05812)
+  {credence: 0.82, reason: "200+ model evaluations, peer-reviewed at NeurIPS, but measures loss not capabilities. Past algorithmic gains may not extrapolate."}
+(2) [AschenbrennerOOM]: Aschenbrenner (2024) estimates ~0.5 OOM/year from
+algorithmic efficiency gains, on par with compute scaling. #observation
+  > "Tracing trendlines in compute (~0.5 orders of magnitude or
+  OOMs/year), algorithmic efficiencies (~0.5 OOMs/year), and 'unhobbling'
+  gains (from chatbot to agent)."
+  [Aschenbrenner, Situational Awareness, 2024](https://situational-awareness.ai/from-gpt-4-to-agi/)
+  {credence: 0.65, reason: "Influential analysis but not peer-reviewed. Extrapolation assumes constant rate of algorithmic progress which is uncertain."}
+----
+(3) Algorithmic efficiency improvements contribute ~0.5 OOM/year of
+effective compute, which helps sustain the scaling trend even if raw
+compute growth slows.
+  +> [ScalingContinues]
+
+
+# Loss vs Capabilities Gap {isGroup: true}
+
+[LossNotCapability]: Even if loss keeps falling on a power law, downstream
+capabilities may plateau, making the scaling law technically true but
+practically irrelevant. #crux
+  - [ScalingContinues]
+
+<BenchmarkPlateau>: Frontier models show diminishing benchmark gains
+despite massive compute increases. #con
+  + [LossNotCapability]
+
+<BenchmarkPlateau>
+
+(1) [PlateauEvidence]: Across MMLU, GSM8K, HumanEval, and HELM, frontier
+models from OpenAI, Anthropic, Google, and Meta show smaller performance
+jumps per OOM of additional compute. #observation
+  > "Frontier models from OpenAI, Anthropic, Google, and Meta show
+  smaller performance jumps on key English benchmarks despite massive
+  increases in training budget."
+  [Masood, Is there a wall? Evidence-Based Analysis, 2024](https://medium.com/@adnanmasood/is-there-a-wall-34d02dfd85f3)
+  {credence: 0.70, reason: "Aggregates public benchmark data, but benchmark saturation may reflect ceiling effects in benchmarks rather than model capability"}
+(2) [BenchmarkCeiling]: Many benchmarks (e.g. MMLU ~90%, GSM8K ~95%) are
+approaching ceiling scores, making further gains hard to measure. #assumption
+  {credence: 0.75, reason: "Mathematical fact that bounded benchmarks saturate, but newer harder benchmarks (FrontierMath, SWE-bench) still show room"}
+----
+(3) Benchmark performance plateaus may reflect benchmark limitations
+rather than fundamental capability limits.
+  + [LossNotCapability]
+  _> <KaplanPowerLaw>
+
+<LossVsCapabilityDistinction>: Pre-training loss and downstream capability
+measure different things. Scaling laws describe loss, not capability. #clarification
+  + [LossNotCapability]
+
+<LossVsCapabilityDistinction>
+
+(1) [LossIsSmooth]: Cross-entropy loss improves smoothly and predictably
+with scale. But capabilities can emerge discontinuously (few-shot
+arithmetic, chain-of-thought reasoning appeared at specific scales). #observation
+  > "Scaling laws define a relationship, based upon a power law, between
+  training compute and the test loss of an LLM, but the impact of lower
+  test loss on an LLM's capabilities is unclear."
+  [Cameron Wolfe, Scaling Laws for LLMs: From GPT-3 to o3](https://cameronrwolfe.substack.com/p/llm-scaling-laws)
+  {credence: 0.80, reason: "Well-known distinction in the field, but recent work suggests emergent abilities may be measurement artifacts (Schaeffer et al. 2023)"}
+----
+(2) The question "do scaling laws continue" must distinguish between
+loss scaling (likely yes) and capability scaling (less certain).
+  + [LossNotCapability]
+
+
+# Test-Time Compute as Alternative Scaling Axis {isGroup: true}
+
+[TestTimeCompute]: Test-time (inference) compute scaling may supplement
+or partially substitute for pre-training compute scaling. #clarification
+  + [ScalingContinues]
+
+<InferenceScaling>: o1/o3-style models show that inference-time compute
+scaling yields large capability gains, providing a new scaling axis. #pro
+  + [TestTimeCompute]
+
+<InferenceScaling>
+
+(1) [O1Evidence]: OpenAI's o1 model demonstrates that performance improves
+as inference-time compute increases (longer "thinking" chains). DeepSeek-R1
+achieves 97.3% on MATH-500. #observation
+  > "One of the most interesting aspects from OpenAI's data on o-1 is
+  that as inference-time compute available to the model increases, the
+  performance of the model improves."
+  [Tanay Jaipuria, OpenAI's o-1 and inference-time scaling laws](https://www.tanayj.com/p/openais-o-1-and-inference-time-scaling)
+  {credence: 0.80, reason: "Publicly demonstrated, but we are early in understanding the limits of inference-time scaling"}
+(2) [SmallModelBig]: Inference scaling has enabled smaller models to
+outperform larger ones on reasoning tasks (o1-mini surpassed by
+smaller model + more inference compute by 17.4%). #observation
+  > "This structured exploration approach has enabled smaller models
+  to outperform larger ones on complex reasoning tasks, including
+  surpassing OpenAI's o1-mini by 17.4% on multi-step planning problems."
+  [Adaline Labs, What is Test-time Scaling?](https://labs.adaline.ai/p/what-is-test-time-scaling)
+  {credence: 0.72, reason: "Demonstrated on specific tasks, unclear if it generalizes across all capabilities"}
+----
+(3) Inference-time compute provides a new dimension of scaling that can
+yield capability gains even if pre-training scaling slows.
+  + [TestTimeCompute]
+
+// But test-time compute doesn't directly address whether pre-training
+// scaling laws hold. It's a complement, not a substitute.
+
+<TestTimeNotPretraining>: Test-time compute scaling is a different
+phenomenon from pre-training scaling laws. Even if it works, it doesn't
+validate that pre-training power laws continue. #con
+  - [TestTimeCompute]
+
+<TestTimeNotPretraining>
+
+(1) [DifferentAxis]: Pre-training scaling laws predict loss as a function
+of training FLOP. Test-time scaling predicts accuracy as a function of
+inference FLOP. These are orthogonal scaling dimensions. #assumption
+  {credence: 0.90, reason: "Definitionally distinct"}
+----
+(2) Test-time compute scaling, while valuable, does not constitute
+evidence that pre-training scaling laws extend to 10^29 FLOP.
+  -> [TestTimeCompute]
+
+
+# Theoretical Grounding {isGroup: true}
+
+<TheoreticalBasis>: There are theoretical reasons to expect power-law
+scaling to continue, rooted in data distribution properties. #pro
+  + [ScalingContinues]
+
+<TheoreticalBasis>
+
+(1) [ZipfianStructure]: Natural language token frequencies follow Zipf's
+law. Theoretical work (e.g. PNAS 2024) shows power-law scaling arises
+from the intrinsic dimensionality of data manifolds and Zipfian structure. #observation
+  > "Superposition may explain the neural scaling law observed in actual
+  LLMs. Naive mapping: atomic features -> tokens. Token frequency:
+  Zipf's law."
+  [NeurIPS 2025 presentation on scaling law theory](https://neurips.cc/media/neurips-2025/Slides/116346.pdf)
+  {credence: 0.65, reason: "Compelling theoretical framework but relies on simplifying assumptions about feature structure. Toy models may not capture full complexity."}
+(2) [PowerLawUbiquity]: Power laws appear in many natural systems (city
+sizes, earthquake magnitudes, species abundances). When they arise from
+scale-free processes they typically hold over many OOM. #assumption
+  {credence: 0.55, reason: "Analogy to other natural phenomena is suggestive but not rigorous. Power laws in nature also have cutoffs."}
+----
+(3) Theoretical models predict scaling from data structure, suggesting
+it should persist unless the data distribution fundamentally changes.
+  +> [ScalingContinues]
+
+<IrreducibleLoss>: There is a nonzero irreducible loss E in the Chinchilla
+formula L = E + A/N^alpha + B/D^beta. As loss approaches E, the
+power law predicts ever-diminishing absolute improvements. #con
+  - [ScalingContinues]
+
+<IrreducibleLoss>
+
+(1) [EntropyFloor]: Human language has irreducible entropy: novel events,
+creative expression, ambiguous references, and inherent randomness set a
+floor on prediction loss. Current frontier models may already be within
+1-2 OOM of this floor for common text. #assumption
+  {credence: 0.60, reason: "Plausible but the irreducible loss E is not well-measured. Estimates vary and it may be lower than expected for high-quality text."}
+(2) [DiminishingReturns]: Near the irreducible loss, each OOM of compute
+yields smaller absolute loss reductions, even though the power-law
+relationship still technically holds. #assumption
+  {credence: 0.85, reason: "Mathematical consequence of the power-law form with a floor term E"}
+----
+(3) The power-law may technically hold but become increasingly
+irrelevant as loss approaches the entropy floor.
+  -> [ScalingContinues]
+  + [LossNotCapability]
+
+
+# Synthesis {isGroup: true}
+
+<WeightOfEvidence>: Weighing all sub-arguments, the scaling law for loss
+will likely hold for 2 more OOM but faces increasing strain approaching
+3 OOM due to data constraints. #clarification
+
+<WeightOfEvidence>
+
+(1) [PowerLawForm]
+(2) [KaplanObs]
+(3) [ChinchillaObs]
+(4) [HestnessObs]
+(5) [VillalobosEstimate]
+(6) [HoErdilObs]
+--
+Aggregating historical evidence and constraint analysis
+{inference: 0.62}
+--
+(7) [ScalingVerdict]: The power-law relationship between compute and loss
+will likely persist for ~2 OOM (to ~10^28 FLOP) with high confidence (~0.80),
+and has a moderate chance (~0.45) of extending the full 3 OOM to 10^29 FLOP,
+conditional on workarounds for data scarcity (synthetic data, multimodal
+training, multi-epoch training). The gap between loss reduction and
+capability gains is the largest source of practical uncertainty. #clarification
+  +> [ScalingContinues]

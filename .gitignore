@@ -8,3 +8,4 @@ argdown.css
 __pycache__/
 *.pyc
 *.html
+*.pdf

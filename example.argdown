@@ -19,11 +19,11 @@ model:
     on intermediate layers of Inception v3 and ResNet-50. #observation
     [Alain & Bengio 2016](https://arxiv.org/abs/1610.01644)
     > "we observe experimentally that the linear separability of features increase monotonically along the depth of the model"
-    {credence: 0.92, reason: "4000+ citations, replicated across architectures"}
+    {reason: "4000+ citations, replicated across architectures", credence: 0.92}
 (2) [Linearity Assumption]: If a property is linearly separable in
     a representation, it is likely encoded explicitly rather than
     requiring nonlinear computation to extract. #assumption
-    {credence: 0.65, reason: "plausible but nonlinear features exist too"}
+    {reason: "plausible but nonlinear features exist too", credence: 0.65}
 --
 Monotonic separability suggests probes track genuine feature quality
 {uses: [1, 2]}
@@ -41,12 +41,12 @@ Monotonic separability suggests probes track genuine feature quality
     to test probe selectivity on ELMo representations. #observation
     [Hewitt & Liang 2019](https://arxiv.org/abs/1909.03368)
     > "popular probes on ELMo representations are not selective"
-    {credence: 0.90, reason: "well-designed experiment, widely cited"}
+    {reason: "well-designed experiment, widely cited", credence: 0.90}
 (2) [Limitations Survey]: Belinkov 2022 reviews the probing
     classifiers methodology. #observation
     [Belinkov 2022](https://arxiv.org/abs/2102.12452)
     > "recent studies have demonstrated various methodological limitations of this approach"
-    {credence: 0.88, reason: "comprehensive survey but some claims are speculative"}
+    {reason: "comprehensive survey but some claims are speculative", credence: 0.88}
 --
 High accuracy alone is insufficient evidence of encoding
 {uses: [1, 2]}

@@ -1,0 +1,310 @@
+===
+title: "Will China initiate a naval blockade of Taiwan before January 1, 2028?"
+author: Superforecasting Agent
+date: 2026-02-10
+subTitle: Structured argument map estimating P(Chinese naval blockade of Taiwan | before Jan 1 2028)
+abstract: >
+  Superforecasting analysis using prediction market data, think tank wargames,
+  military capability assessments, economic analyses, and political signals.
+  Time window is ~23 months from date of analysis. Final estimate: ~14%.
+
+model:
+  mode: strict
+
+map:
+  statementLabelMode: text
+  argumentLabelMode: title
+  groupDepth: 3
+
+color:
+  tagColors:
+    observation: "#2196F3"
+    assumption: "#FF9800"
+    base-rate: "#9C27B0"
+    market: "#4CAF50"
+    capability: "#F44336"
+    deterrent: "#00BCD4"
+    vulnerability: "#E91E63"
+    synthesis: "#607D8B"
+    meta: "#795548"
+===
+
+# Forecast: China Naval Blockade of Taiwan before 2028
+
+[Blockade Before 2028]: China will initiate a naval blockade of Taiwan before January 1, 2028, meaning sustained interdiction of maritime traffic to major ports lasting 10+ days using PLA Navy, Coast Guard, or maritime militia. #synthesis
+{credence: 0.14, reason: "final all-things-considered estimate"}
+
+
+## Outside View {isGroup: true}
+
+### Historical Base Rates {isGroup: true}
+
+[Historical Rarity]: Since 1945, approximately 3 major-power naval blockades have occurred in ~80 years (Cuba 1962, Falklands 1982, plus borderline cases), giving a ~4% annual base rate for any major power blockading a significant target. #base-rate
+{credence: 0.70, reason: "exact count depends on definitions of blockade", source: "CSIS Lights Out Report", url: "https://www.csis.org/analysis/lights-out-wargaming-chinese-blockade-taiwan"}
+
+[No PRC Precedent]: China has never conducted a naval blockade in its modern history, though the PLA has extensively wargamed and exercised blockade scenarios since 2022. #base-rate
+{credence: 0.95, reason: "straightforward historical fact"}
+
+[Time Window]: The question covers ~23 months (Feb 2026 through Dec 2027), roughly 1.9 years. #base-rate
+{credence: 0.99, reason: "arithmetic"}
+
+<Base Rate Argument>: Historical base rates for major-power naval blockades anchor the outside-view estimate low. #base-rate
+
+(1) [Historical Rarity]
+(2) [No PRC Precedent]
+(3) [Time Window]
+----
+(4) [Naive Base Rate]: The naive outside-view base rate for a Chinese naval blockade in a ~2 year window is 3-8%, given the rarity of blockades historically and China's lack of precedent. #base-rate
+{inference: 0.50, reason: "rough historical extrapolation, not yet adjusted for China-specific factors"}
+
+
+### Prediction Markets {isGroup: true}
+
+[Metaculus Blockade 2030]: Metaculus community forecasts ~40% chance of full-scale Chinese blockade of Taiwan before 2030 (96 forecasters). #market #observation
+{credence: 0.75, reason: "large pool but 4-year window, not our 2-year question", url: "https://www.metaculus.com/questions/12309/china-engages-in-a-blockade-against-taiwan/"}
+
+[ACX Blockade 2026]: ACX 2026 contest estimates 14% chance China attacks or blockades Taiwan during 2026 (734 forecasters). Note: includes attack, broader than blockade alone. #market #observation
+{credence: 0.80, reason: "well-calibrated community; broader question definition", url: "https://www.metaculus.com/tournament/ACX2026/"}
+
+[Manifold Invasion 2028]: Manifold Markets estimates ~29-32% chance China begins invasion by 2028. Invasion is more severe than blockade but correlated. #market #observation
+{credence: 0.60, reason: "thin markets, few traders; invasion != blockade", url: "https://manifold.markets/SamuelKnoche/china-blockades-taiwan-before"}
+
+[Polymarket Invasion 2026]: Polymarket shows ~12% for China invading Taiwan by end of 2026. #market #observation
+{credence: 0.65, reason: "real-money market but thin liquidity on geopolitical questions", url: "https://polymarket.com/event/will-china-invade-taiwan-in-2025"}
+
+<Market Aggregation>: Prediction markets provide a wisdom-of-crowds estimate that should anchor the forecast. #market
+
+(1) [Metaculus Blockade 2030]
+(2) [ACX Blockade 2026]
+(3) [Manifold Invasion 2028]
+(4) [Polymarket Invasion 2026]
+--
+Market interpolation: blockade-before-2030 ~40% over 4 years, front-loaded toward 2027 readiness milestone, implies blockade-before-2028 roughly 15-22%. Adjusting for blockade-vs-invasion distinction gives 12-18%. {uses: [1,2,3,4]}
+--
+(5) [Market Estimate]: Prediction markets imply approximately 12-18% probability for a Chinese naval blockade of Taiwan before January 1, 2028. #market #synthesis
+{inference: 0.65, reason: "interpolation requires judgment; markets differ in question wording and trader quality"}
+  +> [Blockade Before 2028]
+
+
+## Factors Increasing Probability {isGroup: true}
+
+### PLA Capability {isGroup: true}
+
+[Davidson Window]: Admiral Davidson testified in 2021 that the China-Taiwan threat is "manifest during this decade, in fact, in the next six years," establishing the ~2027 Davidson window. #capability #observation
+{credence: 0.70, reason: "senior military assessment but may reflect threat inflation for budget purposes", url: "https://www.defensenews.com/pentagon/2024/05/07/how-dc-became-obsessed-with-a-potential-2027-chinese-invasion-of-taiwan/"}
+
+[DoD 2027 Assessment]: Pentagon 2025 annual report states China expects to fight and win a war on Taiwan by end of 2027. This is a capability readiness goal, not an intent date. #capability #observation
+{credence: 0.85, reason: "official Pentagon assessment; capable != will act", url: "https://media.defense.gov/2025/Dec/23/2003849070/-1/-1/1/ANNUAL-REPORT-TO-CONGRESS-MILITARY-AND-SECURITY-DEVELOPMENTS-INVOLVING-THE-PEOPLES-REPUBLIC-OF-CHINA-2025.PDF"}
+
+<PLA 2027 Readiness>: The PLA 2027 capability milestone falls within our forecast window, meaning the PLA will reach or approach readiness for a Taiwan operation. #capability
+
+(1) [Davidson Window]
+(2) [DoD 2027 Assessment]
+----
+(3) [Capability Window]: By late 2027 the PLA expects to have the capability for a Taiwan blockade or invasion. Necessary but not sufficient condition. #capability
+{inference: 0.75, reason: "capability is necessary but the decision gap is large"}
+  + [Blockade Before 2028]
+
+[Justice Mission 2025]: In December 2025, PRC conducted large-scale Justice Mission 2025 exercises simulating blockade of Taiwan's major ports and energy import interdiction, deploying 14 Coast Guard vessels alongside PLA Navy ships. Second such exercise in 2025. #capability #observation
+{credence: 0.90, reason: "ISW open-source analysis corroborated by multiple outlets", url: "https://understandingwar.org/research/china-taiwan/china-taiwan-special-report-december-31-2025/"}
+
+[Exercise Frequency]: PLA conducted blockade exercises with increasing frequency since Lai inauguration in May 2024: Joint Sword-2024A, Joint Sword-2024B, two Justice Mission exercises in 2025. #capability #observation
+{credence: 0.90, reason: "clear pattern in open source", url: "https://understandingwar.org/research/china-taiwan/china-taiwan-special-report-december-31-2025/"}
+
+[Operational Tempo 2025]: In 2025, Chinese military vessels operated at least 999 total estimated ship-days across four maritime zones with increased activity near Japan and beyond the First Island Chain. #capability #observation
+{credence: 0.85, reason: "CSIS quantitative analysis of MSA reports", url: "https://chinapower.csis.org/china-increased-military-activities-indo-pacific-2025/"}
+
+<Blockade Rehearsals>: Accelerating exercise cadence suggests PLA building operational proficiency consistent with 2027 readiness. #capability
+
+(1) [Justice Mission 2025]
+(2) [Exercise Frequency]
+(3) [Operational Tempo 2025]
+----
+(4) [Rehearsal Trajectory]: Each exercise iteration improves PLA blockade execution capability. The cadence signals serious preparation. #capability
+{inference: 0.70, reason: "exercises increase readiness but militaries exercise contingencies they never execute"}
+  + [Blockade Before 2028]
+
+
+### Blockade as Lower-Cost Option {isGroup: true}
+
+[Escalation Ladder]: Chinese military doctrine describes a spectrum from quarantine (grey-zone) to blockade (act of war) to invasion (decisive but risky). Blockade is the middle option. #observation
+{credence: 0.85, reason: "CSIS analysis based on Chinese doctrinal sources", url: "https://www.csis.org/analysis/lights-out-wargaming-chinese-blockade-taiwan"}
+
+[Invasion Casualties]: Studies estimate 100,000+ PLA casualties in a failed Taiwan invasion. Blockade casualties substantially lower in opening phase. #observation
+{credence: 0.70, reason: "wargame-derived; actual casualties depend on many variables", url: "https://ipdefenseforum.com/2026/01/pla-would-suffer-100000-casualties-in-failed-taiwan-invasion-study-says/"}
+
+[CCG Legal Grey Zone]: China can frame a quarantine or blockade as law enforcement or customs inspection, exploiting legal grey zones. Justice Mission exercises integrated CCG specifically for this purpose. #observation
+{credence: 0.75, reason: "consistent with observed CCG integration; international community may not accept framing", url: "https://understandingwar.org/research/china-taiwan/china-taiwan-special-report-december-31-2025/"}
+
+<Blockade Lower Threshold>: A blockade is less escalatory, less costly, and more legally ambiguous than invasion, making it a more likely first-resort option. #capability
+
+(1) [Escalation Ladder]
+(2) [Invasion Casualties]
+(3) [CCG Legal Grey Zone]
+----
+(4) [Lower Threshold]: A blockade has a lower military and political threshold than invasion, making it the more likely first coercive option against Taiwan. #synthesis
+{inference: 0.60, reason: "blockade still creates severe escalatory pressures per CSIS wargames"}
+  + [Blockade Before 2028]
+
+
+### Taiwan Vulnerability {isGroup: true}
+
+[Energy Reserves]: Taiwan energy reserves critically low: LNG covers ~11 days, coal ~39 days, oil ~146 days. Power rationing begins within one week of successful blockade. #vulnerability #observation
+{credence: 0.80, reason: "publicly available energy import data; exact levels vary seasonally", url: "https://www.metaculus.com/questions/12309/china-engages-in-a-blockade-against-taiwan/"}
+
+[TSMC Concentration]: Taiwan produces 92% of the world's most advanced logic chips. TSMC production would halt from power rationing. #vulnerability #observation
+{credence: 0.85, reason: "well-documented semiconductor concentration risk"}
+
+<Energy Vulnerability>: Taiwan's extreme energy import dependence could tempt China to believe a blockade would succeed quickly. #vulnerability
+
+(1) [Energy Reserves]
+(2) [TSMC Concentration]
+----
+(3) [Vulnerability Temptation]: Taiwan's vulnerability to blockade increases China's confidence in the option, raising probability of attempt. #vulnerability
+{inference: 0.55, reason: "vulnerability is real but China also depends on TSMC supply chain"}
+  + [Blockade Before 2028]
+
+[Semiconductor Shield]: China still imports significant volumes of advanced chips from TSMC-dependent supply chains. A blockade would cut off China's own access, creating mutual deterrence. #deterrent
+{credence: 0.60, reason: "China investing in domestic chips; dependence decreasing but still significant through 2027"}
+  _> <Energy Vulnerability>
+
+
+## Factors Decreasing Probability {isGroup: true}
+
+### Economic Deterrence {isGroup: true}
+
+[Global Cost 2.7T]: Institute for Economics and Peace estimates a Chinese blockade would cost $2.7 trillion globally in year one, with 2.8% decline in global output -- nearly double the 2008 crisis. #deterrent #observation
+{credence: 0.75, reason: "conservative by authors admission; models uncertain on second-order effects", url: "https://www.visionofhumanity.org/assessing-the-global-economic-ramifications-of-a-chinese-blockade-on-taiwan/"}
+
+[China GDP Minus 7]: China's own economy would shrink ~7% from a blockade, even before international sanctions. #deterrent #observation
+{credence: 0.70, reason: "model-dependent; actual sanctions response unknown", url: "https://www.visionofhumanity.org/assessing-the-global-economic-ramifications-of-a-chinese-blockade-on-taiwan/"}
+
+[China Domestic Fragility]: China already faces first annual FAI decline in decades (-3.8% in 2025), deepening property crisis, and slowing Q4 2025 growth at 3-year low. #deterrent #observation
+{credence: 0.85, reason: "Fitch Ratings official data", url: "https://www.cnbc.com/2026/01/21/chinas-investment-crash-credit-default-risks-real-estate-banks-fitch.html"}
+
+[Sanctions Threat]: RAND analysis shows US already using economic measures to deter Chinese attack on Taiwan; Western sanctions modeled on Russia response would compound damage. #deterrent #observation
+{credence: 0.80, reason: "RAND analysis; actual implementation depends on political will", url: "https://www.rand.org/content/dam/rand/pubs/research_reports/RRA4000/RRA4022-1/RAND_RRA4022-1.pdf"}
+
+<Economic Self-Harm>: Enormous economic costs to China, compounded by domestic fragility, provide strong deterrence against a blockade. #deterrent
+
+(1) [Global Cost 2.7T]
+(2) [China GDP Minus 7]
+(3) [China Domestic Fragility]
+(4) [Sanctions Threat]
+----
+(5) [Economic Deterrent]: Economic self-harm from a blockade would be severe enough to deter action in most scenarios, unless political stakes perceived as existential. #deterrent
+{inference: 0.80, reason: "costs are real but authoritarian regimes sometimes accept enormous costs as Russia demonstrated"}
+  - [Blockade Before 2028]
+
+[Russia Precedent]: Russia invaded Ukraine despite sanctions contracting its GDP ~2-3%, demonstrating authoritarian leaders may accept large economic costs for perceived political necessity. China's integration is deeper but the precedent weakens economic deterrence arguments. #observation
+{credence: 0.70, reason: "genuine counter-example; China's economic integration deeper than Russia's was"}
+  _> <Economic Self-Harm>
+
+
+### US Deterrence {isGroup: true}
+
+[Strategic Ambiguity Continues]: Despite Trump omission of Taiwan from defense strategy, analysts assess US policy unchanged and defense cooperation strengthens. #deterrent #observation
+{credence: 0.70, reason: "analyst assessment; actual Trump behavior unpredictable", url: "https://focustaiwan.tw/politics/202602070007"}
+
+[Unpredictability Deterrence]: Trump unpredictability may enhance deterrence by forcing Beijing into difficult calculations about US intervention likelihood. #deterrent #observation
+{credence: 0.55, reason: "could go either way; might embolden if read as disinterest", url: "https://focustaiwan.tw/politics/202602070007"}
+
+[Wargame Casualties]: CSIS wargames show even low-escalation blockade scenarios produce thousands of casualties; at higher levels US loses hundreds of aircraft and dozens of warships, but Chinese losses often higher. #deterrent #observation
+{credence: 0.80, reason: "26 wargames provide robust dataset; wargames simplify reality", url: "https://www.csis.org/analysis/lights-out-wargaming-chinese-blockade-taiwan"}
+
+<US Deterrence Argument>: US military capability and intervention willingness raises expected cost of blockade, deterring action in most scenarios. #deterrent
+
+(1) [Strategic Ambiguity Continues]
+(2) [Unpredictability Deterrence]
+(3) [Wargame Casualties]
+----
+(4) [US Deterrence Effect]: US deterrence is operative but uncertain. Deters blockade in most scenarios but may not hold if China perceives US as distracted or uncommitted. #deterrent
+{inference: 0.70, reason: "deterrence works only if China believes US will act"}
+  - [Blockade Before 2028]
+
+[Trump Less Inclined]: Reports suggest Trump less inclined to protect Taiwan than predecessors, with Taiwan omitted from defense strategy. #observation
+{credence: 0.50, reason: "opinion-level evidence; rhetoric may differ from action", url: "https://www.nytimes.com/2026/01/24/opinion/taiwan-china-us-trump-xi.html"}
+  _> <US Deterrence Argument>
+
+
+### Absence of Intent Signal {isGroup: true}
+
+[Xi Denied Timeline]: At November 2023 Biden-Xi summit, Xi reportedly denied plans for military action on Taiwan in 2027 or 2035. #observation
+{credence: 0.40, reason: "diplomatic statements may be deceptive; actions matter more than words", url: "https://www.straitstimes.com/asia/east-asia/xi-denies-2027-taiwan-invasion-plans-but-analysts-say-island-should-remain-vigilant"}
+
+[Capability Not Intent]: CIA Director Burns stated: Xi instructed PLA to be ready by 2027, but that does not mean he has decided to invade in 2027 or any other year. #observation
+{credence: 0.80, reason: "senior intelligence assessment; analytically sound distinction", url: "https://news.usni.org/2021/06/23/milley-china-wants-capability-to-take-taiwan-by-2027-sees-no-near-term-intent-to-invade"}
+
+<No Committed Timeline>: No strong evidence Xi has made a decision to act on a specific timeline. Pentagon assessment: conflict is neither imminent nor inevitable. #deterrent
+
+(1) [Xi Denied Timeline]
+(2) [Capability Not Intent]
+----
+(3) [No Decision Signal]: Absence of evidence for a committed blockade decision reduces probability. 2027 is a capability milestone, not a political decision point. #deterrent
+{inference: 0.65, reason: "absence of evidence is weak evidence of absence; Xi may decide rapidly on trigger"}
+  - [Blockade Before 2028]
+
+
+### Escalation Dynamics {isGroup: true}
+
+[Escalation Spiral]: In CSIS wargames, most free-play games escalated despite reluctance, with 2 of 26 games spiraling to general war. #deterrent #observation
+{credence: 0.80, reason: "wargame evidence; real decision-makers may behave differently", url: "https://www.csis.org/analysis/lights-out-wargaming-chinese-blockade-taiwan"}
+
+[Rally Around Flag]: Historical evidence shows blockades produce rally-around-the-flag effects in target populations, potentially pushing Taiwan toward independence declaration -- opposite of China's goal. #deterrent #observation
+{credence: 0.75, reason: "historical pattern established; applicability to Taiwan uncertain"}
+
+<Escalation Trap>: China knows a blockade risks spiraling into a war it might lose, including US intervention; this acts as a brake on initiating. #deterrent
+
+(1) [Escalation Spiral]
+(2) [Rally Around Flag]
+----
+(3) [Escalation Deterrence]: Blockade tendency to escalate and produce counterproductive rally effects deters initiation. #deterrent
+{inference: 0.70, reason: "assumes rational risk assessment; miscalculation could bypass this logic"}
+  - [Blockade Before 2028]
+
+
+## Trigger Events and Timing {isGroup: true}
+
+[Lai Administration]: President Lai Ching-te (DPP, inaugurated May 2024) perceived by Beijing as independence-leaning. Inauguration triggered multiple military exercises. #vulnerability #observation
+{credence: 0.85, reason: "clear causal link between inauguration and exercise frequency", url: "https://understandingwar.org/research/china-taiwan/china-taiwan-special-report-december-31-2025/"}
+
+[No Independence Expected]: Despite DPP governance, Taiwan maintained strategic ambiguity on independence. Formal declaration remains unlikely under current conditions. #assumption
+{credence: 0.80, reason: "Taipei has strong incentives not to provoke"}
+
+[Miscalculation Risk]: Most dangerous path to blockade is not deliberate decision but escalation from exercises, incidents, or political crises that spiral beyond intended limits. #assumption
+{credence: 0.65, reason: "historical pattern of wars from miscalculation; CSIS wargames confirm escalation pressure"}
+
+<Trigger Assessment>: In the absence of a major trigger event, deliberate blockade initiation is unlikely, but miscalculation or crisis escalation cannot be ruled out. #synthesis
+
+(1) [Lai Administration]
+(2) [No Independence Expected]
+(3) [Miscalculation Risk]
+----
+(4) [Trigger Probability]: The most likely trigger (independence move) has low probability in this window, but miscalculation risk from increasing exercise frequency provides a non-trivial escalation probability. #synthesis
+{inference: 0.60, reason: "trigger probability hardest to estimate; tail risks dominate"}
+
+
+## Synthesis {isGroup: true}
+
+<Final Synthesis>: Combining outside view base rates with inside view adjustments. #synthesis
+
+(1) [Naive Base Rate]
+(2) [Market Estimate]
+(3) [Capability Window]
+(4) [Economic Deterrent]
+(5) [US Deterrence Effect]
+(6) [No Decision Signal]
+----
+(7) [Final Estimate]: Weighing outside view (3-8%), prediction markets (12-18%), upward factors (PLA readiness, exercise trajectory, lower blockade threshold, Taiwan vulnerability), and downward factors (economic self-harm, US deterrence, no committed timeline, escalation trap): probability of a Chinese naval blockade of Taiwan before January 1, 2028 is approximately 14% (range: 8-22%). Estimate sits slightly below market median because markets include broader definitions, economic deterrence is strong, and no evidence of a committed decision exists. Key uncertainties: US deterrence credibility under Trump, trigger event probability, whether 2027 capability translates to action. #synthesis
+{inference: 0.70, reason: "synthesized judgment; irreducible uncertainty from geopolitical tail risk"}
+  + [Blockade Before 2028]
+
+
+# Format Observations
+
+[Format Strengths]: Argdown naturally handles several forecasting patterns: pro/con maps to probability-increasing vs decreasing factors; undercut captures weakened inferences (e.g. Russia precedent undercutting economic deterrence); tags distinguish evidence types; metadata attaches source quality and credence to individual claims; PCS makes multi-step reasoning chains explicit. #meta
+
+[Format Limitations]: Argdown cannot natively express: conditional probabilities P(blockade given trigger), correlation between arguments needed to avoid double-counting, branching scenario trees, time-dependent hazard rates, or mathematical aggregation from premise credences to conclusion probability. These are fundamental limits of argument-graph formalisms for forecasting. #meta
+
+[Format Limitations]
+  >< [Format Strengths]
