@@ -1,0 +1,126 @@
+===
+title: Does Intermittent Fasting Extend Human Lifespan?
+author: Deep Research Agent
+model:
+    mode: strict
+===
+
+// Top-level claim -- NO hardcoded credence, computed from arguments below
+[IF Extends Lifespan]: Intermittent fasting extends human lifespan.
+  + <Metabolic Switch Mechanism>
+  + <Biomarker Improvement>
+  - <Inconsistent Animal Results>
+  - <Translation Gap>
+  - <Adherence Problem>
+
+# Evidence For
+
+<Metabolic Switch Mechanism>
+
+(1) [Metabolic Switch]: De Cabo & Mattson 2019 report that fasting
+    triggers a shift from glucose to ketone metabolism with increased
+    longevity in animal models. #observation
+    [De Cabo & Mattson 2019](https://www.nejm.org/doi/full/10.1056/NEJMra1905136)
+    > "Evidence is accumulating that eating in a 6-hour period and fasting for 18 hours can trigger a metabolic switch from glucose-based to ketone-based energy, with increased stress resistance, increased longevity, and a decreased incidence of diseases"
+    {credence: 0.80, reason: "NEJM review, highly cited, but summarizes animal and observational evidence"}
+(2) [Stress Pathways]: Mattson et al. 2017 find IF activates
+    stress-response pathways including BDNF and autophagy. #observation
+    [Mattson et al. 2017](https://doi.org/10.1073/pnas.1611299114)
+    > "Intermittent metabolic switching, repeating cycles of a metabolic challenge that activates stress response signaling pathways, and a recovery period with rest and food intake, may optimize brain function and resilience"
+    {credence: 0.70, reason: "PNAS paper, plausible mechanism, but animal model data"}
+(3) [Cellular Maintenance]: Longo & Panda 2016 argue fasting triggers
+    cellular maintenance pathways that could delay aging. #observation
+    [Longo & Panda 2016](https://doi.org/10.1016/j.cmet.2015.12.005)
+    > "Fasting has the potential to delay aging and help prevent and treat diseases while minimizing the side effects caused by chronic dietary interventions"
+    {credence: 0.65, reason: "Cell Metabolism review, but 'potential' language is hedged"}
+--
+Multiple plausible mechanisms connect IF to longevity-related pathways
+{uses: [1, 2, 3]}
+--
+(4) [Mechanism Exists]: IF activates known longevity-associated biological
+    pathways in animal models.
+    {inference: 0.70, reason: "mechanisms are real but mostly demonstrated in animals"}
+  +> [IF Extends Lifespan]
+
+<Biomarker Improvement>
+
+(1) [ADF Biomarkers]: Stekovic et al. 2019 show alternate-day fasting
+    improved cardiovascular markers and reduced fat mass in a 4-week
+    RCT of 60 healthy adults. #observation
+    [Stekovic et al. 2019](https://doi.org/10.1016/j.cmet.2019.09.007)
+    > "Strict ADF for more than 6 months improved markers of general health in healthy, middle-aged humans while adverse effects did not occur even after >6 months"
+    {credence: 0.75, reason: "RCT but small sample, short duration, surrogate endpoints"}
+(2) [Biomarker Assumption]: Improved cardiovascular and metabolic
+    biomarkers predict longer lifespan. #assumption
+    {credence: 0.50, reason: "biomarker-outcome link is uncertain; surrogate endpoints often fail"}
+--
+Surrogate markers improved by IF may indicate lifespan benefit
+{uses: [1, 2]}
+--
+(3) [Human Biomarker Signal]: IF improves biomarkers associated with
+    longevity in short-term human trials.
+    {inference: 0.45, reason: "surrogate endpoints, small trial, short duration"}
+  +> [IF Extends Lifespan]
+
+# Evidence Against
+
+<Inconsistent Animal Results>
+
+(1) [ITP Inconsistent]: The NIA Interventions Testing Program finds IF
+    protocols show inconsistent lifespan extension across genetically
+    heterogeneous mice. #observation
+    [NIA ITP](https://www.nia.nih.gov/research/dab/interventions-testing-program-itp)
+    > "Caloric restriction remains the gold standard; intermittent fasting protocols tested have shown inconsistent lifespan extension in genetically heterogeneous mice"
+    {credence: 0.82, reason: "ITP is gold-standard multi-site program for lifespan testing"}
+(2) [Circadian Dependency]: Pak et al. 2021 show IF lifespan extension
+    in Drosophila requires intact circadian clock genes. #observation
+    [Pak et al. 2021](https://doi.org/10.1038/s43587-021-00127-4)
+    > "Time-restricted feeding promotes longevity through circadian clock-mediated improvement of gut homeostasis"
+    {credence: 0.70, reason: "Nature Aging paper, but Drosophila model"}
+--
+IF lifespan effects are genotype-dependent and inconsistent across models
+{uses: [1, 2]}
+--
+(3) [Animal Evidence Weak]: Animal evidence for IF lifespan extension
+    is inconsistent and genotype-dependent.
+    {inference: 0.75, reason: "ITP is the strongest lifespan evidence and it is negative"}
+  -> [IF Extends Lifespan]
+
+<Translation Gap>
+
+(1) [Translation Problem]: A 2023 Cell review notes that translating
+    lifespan findings from model organisms to humans remains a central
+    challenge. #observation
+    [Cell 2023](https://doi.org/10.1016/j.cell.2022.12.035)
+    > "Translation of findings from short-lived model organisms to humans remains a central challenge in aging research"
+    {credence: 0.88, reason: "Cell review, well-established problem in aging research"}
+(2) [No Human Lifespan Data]: No RCT has measured actual human lifespan
+    as an endpoint for IF. #assumption
+    {credence: 0.95, reason: "such a trial would take decades; none exists"}
+--
+Even positive animal results may not translate to human lifespan
+{uses: [1, 2]}
+--
+(3) [No Direct Evidence]: There is no direct evidence that IF extends
+    human lifespan.
+    {inference: 0.90, reason: "absence of evidence is strong given translation gap"}
+  -> [IF Extends Lifespan]
+
+<Adherence Problem>
+
+(1) [High Dropout]: Lowe et al. 2020 report dropout rates of 20-40%
+    in IF trials. #observation
+    [Lowe et al. 2020](https://doi.org/10.1001/jamainternmed.2020.3049)
+    > "dropout rates in intermittent fasting trials range from 20% to 40%, comparable to other dietary interventions"
+    {credence: 0.78, reason: "JAMA Internal Medicine RCT, found no weight loss benefit either"}
+(2) [Adherence Required]: A lifespan intervention must be sustained
+    for decades to plausibly affect longevity. #assumption
+    {credence: 0.85, reason: "biological aging is slow; brief interventions unlikely to shift lifespan"}
+--
+Poor adherence undermines real-world lifespan benefit even if IF works biologically
+{uses: [1, 2]}
+--
+(3) [Practical Barrier]: Real-world adherence problems make sustained
+    IF unlikely to deliver lifespan benefits at population scale.
+    {inference: 0.60, reason: "adherence is bad but comparable to other diets, not unique to IF"}
+  -> [IF Extends Lifespan]

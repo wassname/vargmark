@@ -1,0 +1,83 @@
+===
+title: Does Intermittent Fasting Extend Human Lifespan?
+author: vargdown skill test v2
+model:
+    mode: strict
+===
+
+// Top-level claim -- NO hardcoded credence, computed via log-odds aggregation
+[IF Extends Lifespan]: Intermittent fasting meaningfully extends human lifespan.
+  + <Longevity Pathways>
+  + <Human Biomarker Evidence>
+  - <Weak Animal Evidence>
+
+# Evidence For
+
+<Longevity Pathways>
+
+(1) [NEJM Metabolic Switch]: De Cabo & Mattson 2019 review evidence that
+    fasting triggers a metabolic switch linked to increased longevity. #observation
+    [De Cabo & Mattson 2019](https://www.nejm.org/doi/full/10.1056/NEJMra1905136)
+    > "Evidence is accumulating that eating in a 6-hour period and fasting for 18 hours can trigger a metabolic switch from glucose-based to ketone-based energy, with increased stress resistance, increased longevity, and a decreased incidence of diseases"
+    {credence: 0.78, reason: "NEJM review, high prestige, but summarizes mostly animal data"}
+(2) [Aging Delay]: Longo & Panda 2016 argue fasting can delay aging
+    through cellular maintenance pathways. #observation
+    [Longo & Panda 2016](https://doi.org/10.1016/j.cmet.2015.12.005)
+    > "Fasting has the potential to delay aging and help prevent and treat diseases while minimizing the side effects caused by chronic dietary interventions"
+    {credence: 0.65, reason: "Cell Metabolism review, but hedged language ('potential')"}
+(3) [Stress Response]: Mattson et al. 2017 describe intermittent metabolic
+    switching as activating beneficial stress-response signaling. #observation
+    [Mattson et al. 2017](https://doi.org/10.1073/pnas.1611299114)
+    > "Intermittent metabolic switching, repeating cycles of a metabolic challenge that activates stress response signaling pathways, and a recovery period with rest and food intake, may optimize brain function and resilience"
+    {credence: 0.68, reason: "PNAS paper, plausible mechanism but animal models only"}
+----
+(4) [Mechanisms Plausible]: Multiple biological pathways connect IF to
+    longevity-related processes in animal models.
+    {inference: 0.65, reason: "converging mechanisms but all from animals, not human lifespan data"}
+  +> [IF Extends Lifespan]
+
+<Human Biomarker Evidence>
+
+(1) [ADF Trial]: Stekovic et al. 2019 RCT of alternate-day fasting
+    in 60 healthy adults found improved health markers with no adverse
+    effects over 6 months. #observation
+    [Stekovic et al. 2019](https://doi.org/10.1016/j.cmet.2019.09.007)
+    > "Strict ADF for more than 6 months improved markers of general health in healthy, middle-aged humans while adverse effects did not occur even after >6 months"
+    {credence: 0.72, reason: "RCT in humans, but small sample (n=60) and surrogate endpoints only"}
+(2) [Biomarker-Lifespan Link]: Improved cardiovascular and metabolic
+    markers predict longer lifespan. #assumption
+    {credence: 0.45, reason: "surrogate endpoint assumption; biomarker-outcome links often fail in practice"}
+----
+(3) [Human Signal Exists]: Short-term human trials show IF improves
+    biomarkers associated with longevity.
+    {inference: 0.40, reason: "weak: small trial, surrogate endpoints, no actual lifespan measurement"}
+  +> [IF Extends Lifespan]
+
+# Evidence Against
+
+<Weak Animal Evidence>
+
+(1) [ITP Inconsistency]: The NIA Interventions Testing Program finds IF
+    lifespan results inconsistent across genetically diverse mice. #observation
+    [NIA ITP](https://www.nia.nih.gov/research/dab/interventions-testing-program-itp)
+    > "Caloric restriction remains the gold standard; intermittent fasting protocols tested have shown inconsistent lifespan extension in genetically heterogeneous mice"
+    {credence: 0.85, reason: "ITP is the gold-standard multi-site lifespan testing program"}
+(2) [Circadian Dependency]: Pak et al. 2021 show IF lifespan extension
+    in Drosophila depends on intact circadian clock genes. #observation
+    [Pak et al. 2021](https://doi.org/10.1038/s43587-021-00127-4)
+    > "Time-restricted feeding promotes longevity through circadian clock-mediated improvement of gut homeostasis"
+    {credence: 0.70, reason: "Nature Aging, but Drosophila model limits generalizability"}
+(3) [Translation Challenge]: A 2023 Cell review notes translating
+    model organism lifespan findings to humans is a central challenge
+    in aging research. #observation
+    [Cell 2023](https://doi.org/10.1016/j.cell.2022.12.035)
+    > "Translation of findings from short-lived model organisms to humans remains a central challenge in aging research"
+    {credence: 0.88, reason: "Cell review, well-established problem, applies directly here"}
+(4) [No Human Lifespan Trial]: No RCT has ever measured actual human
+    lifespan as an endpoint for any IF protocol. #assumption
+    {credence: 0.95, reason: "such a trial would take decades and cost billions; none exists or is planned"}
+----
+(5) [Insufficient Evidence]: The animal evidence is inconsistent, the
+    translation gap is real, and no direct human lifespan data exists.
+    {inference: 0.82, reason: "strongest evidence (ITP) is negative; no human endpoint data at all"}
+  -> [IF Extends Lifespan]

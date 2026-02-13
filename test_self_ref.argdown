@@ -1,0 +1,66 @@
+===
+title: Does Structured Argumentation Close the Verification Gap?
+author: vargdown SKILL.md
+model:
+    mode: strict
+===
+
+[Closes Gap]: Structured argument maps with sourced quotes and
+  computed credences close the verification gap in LLM-generated reasoning.
+  + <Debate Helps>
+  + <Structure Helps>
+  - <Overhead Cost>
+
+# Evidence For
+
+<Debate Helps>
+
+(1) [Debate]: Irving et al. 2018 propose AI safety via debate, where
+    agents argue opposing sides and a judge evaluates. #observation
+    [Irving et al. 2018](https://arxiv.org/abs/1805.00899)
+    > "debate, where two agents compete to convince a judge, can be used to train models that are safe"
+    {credence: 0.75, reason: "influential but empirical validation is limited"}
+(2) [Oversight]: Bowman et al. 2022 argue scalable oversight requires
+    decomposing arguments so humans check small steps. #observation
+    [Bowman et al. 2022](https://arxiv.org/abs/2211.03540)
+    > "we need mechanisms for humans to oversee tasks they cannot directly evaluate"
+    {credence: 0.80, reason: "widely cited position paper from NYU alignment group"}
+----
+(3) [Decomposition Works]: Breaking arguments into individually
+    checkable steps enables human verification at scale.
+    {inference: 0.70, reason: "plausible mechanism, but empirical evidence thin"}
+  +> [Closes Gap]
+
+<Structure Helps>
+
+(1) [Arg Mapping]: Nesbit & Liu 2025 review argument mapping in
+    higher education and find it improves critical thinking. #observation
+    [Nesbit & Liu 2025](https://doi.org/10.1111/hequ.70063)
+    > "argument mapping in higher education: a systematic review"
+    {credence: 0.70, reason: "systematic review, but effect sizes vary"}
+(2) [Hallucination Rate]: Safran & Cali 2025 find only 7.5% of
+    LLM-generated references are fully accurate. #observation
+    [Safran & Cali 2025](https://doi.org/10.38053/acmj.1746227)
+    > "Only 7.5% of references were fully accurate in the initial generation, while 42.5% were completely fabricated"
+    {credence: 0.80, reason: "small study (40 refs) but consistent with other findings"}
+----
+(3) [Forced Sourcing Helps]: Requiring URL + exact quote per claim
+    makes hallucinated citations immediately visible.
+    {inference: 0.85, reason: "if quote must be verbatim, fabrication is caught on click"}
+  +> [Closes Gap]
+
+# Evidence Against
+
+<Overhead Cost>
+
+(1) [Verbosity]: Vargdown files are 3-5x longer than prose summaries,
+    requiring more LLM tokens and human reading time. #assumption
+    {credence: 0.90, reason: "observed in our own tests: ~200 lines vs ~50 lines prose"}
+(2) [Parser Friction]: Argdown strict mode rejects common patterns
+    like unnamed conclusions and ><, increasing failure rate. #assumption
+    {credence: 0.70, reason: "seen in 3/4 initial agent tests"}
+----
+(3) [Too Costly]: The overhead of structured format may not be
+    worth the verification benefit for simple questions.
+    {inference: 0.40, reason: "overhead is real but format is for complex contested claims, not simple queries"}
+  -> [Closes Gap]
