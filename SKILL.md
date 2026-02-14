@@ -36,12 +36,12 @@ model:
 (1) [Debate]: Irving et al. 2018 propose AI safety via debate, where
     agents argue opposing sides and a judge evaluates. #observation
     [Irving et al. 2018](https://arxiv.org/abs/1805.00899)
-    > "debate, where two agents compete to convince a judge, can be used to train models that are safe"
+    > "we propose training agents via self play on a zero sum debate game"
     {credence: 0.75, reason: "influential but empirical validation is limited"}
 (2) [Oversight]: Bowman et al. 2022 argue scalable oversight requires
     decomposing arguments so humans check small steps. #observation
     [Bowman et al. 2022](https://arxiv.org/abs/2211.03540)
-    > "we need mechanisms for humans to oversee tasks they cannot directly evaluate"
+    > "scalable oversight: the problem of supervising systems that potentially outperform us on most skills relevant to the task at hand"
     {credence: 0.80, reason: "widely cited position paper from NYU alignment group"}
 ----
 (3) [Decomposition Works]: Breaking arguments into individually
@@ -51,11 +51,11 @@ model:
 
 <Structure Helps>
 
-(1) [Arg Mapping]: Nesbit & Liu 2025 review argument mapping in
-    higher education and find it improves critical thinking. #observation
+(1) [Arg Mapping]: Nesbit & Liu 2025 systematically reviewed 124
+    studies on argument mapping in higher education. #observation
     [Nesbit & Liu 2025](https://doi.org/10.1111/hequ.70063)
-    > "argument mapping in higher education: a systematic review"
-    {credence: 0.70, reason: "systematic review, but effect sizes vary"}
+    > "the weight of evidence supports a recommendation that instructors use argument mapping to develop critical thinking and argumentation skills"
+    {credence: 0.70, reason: "systematic review of 124 studies, but effect sizes vary and meta-analysis still needed"}
 (2) [Hallucination Rate]: Safran & Cali 2025 find only 7.5% of
     LLM-generated references are fully accurate. #observation
     [Safran & Cali 2025](https://doi.org/10.38053/acmj.1746227)

@@ -22,14 +22,14 @@ model:
     {credence: 0.78, reason: "NEJM review, high prestige, but summarizes mostly animal data"}
 (2) [Aging Delay]: Longo & Panda 2016 argue fasting can delay aging
     through cellular maintenance pathways. #observation
-    [Longo & Panda 2016](https://doi.org/10.1016/j.cmet.2015.12.005)
-    > "Fasting has the potential to delay aging and help prevent and treat diseases while minimizing the side effects caused by chronic dietary interventions"
+    [Longo & Panda 2016](https://doi.org/10.1016/j.cmet.2016.06.001)
+    > "Both intermittent and periodic fasting result in benefits ranging from the prevention to the enhanced treatment of diseases"
     {credence: 0.65, reason: "Cell Metabolism review, but hedged language ('potential')"}
-(3) [Stress Response]: Mattson et al. 2017 describe intermittent metabolic
-    switching as activating beneficial stress-response signaling. #observation
-    [Mattson et al. 2017](https://doi.org/10.1073/pnas.1611299114)
-    > "Intermittent metabolic switching, repeating cycles of a metabolic challenge that activates stress response signaling pathways, and a recovery period with rest and food intake, may optimize brain function and resilience"
-    {credence: 0.68, reason: "PNAS paper, plausible mechanism but animal models only"}
+(3) [Stress Response]: Mattson et al. 2018 describe intermittent metabolic
+    switching as optimizing brain function and resilience. #observation
+    [Mattson et al. 2018](https://doi.org/10.1038/nrn.2017.156)
+    > "intermittent metabolic switching, repeating cycles of a metabolic challenge that induces ketosis (fasting and/or exercise) followed by a recovery period (eating, resting and sleeping), may optimize brain function and resilience throughout the lifespan"
+    {credence: 0.68, reason: "Nat Rev Neurosci paper, plausible mechanism but animal models only"}
 ----
 (4) [Mechanisms Plausible]: Multiple biological pathways connect IF to
     longevity-related processes in animal models.
@@ -39,11 +39,11 @@ model:
 <Human Biomarker Evidence>
 
 (1) [ADF Trial]: Stekovic et al. 2019 RCT of alternate-day fasting
-    in 60 healthy adults found improved health markers with no adverse
+    in healthy adults found improved health markers with no adverse
     effects over 6 months. #observation
-    [Stekovic et al. 2019](https://doi.org/10.1016/j.cmet.2019.09.007)
-    > "Strict ADF for more than 6 months improved markers of general health in healthy, middle-aged humans while adverse effects did not occur even after >6 months"
-    {credence: 0.72, reason: "RCT in humans, but small sample (n=60) and surrogate endpoints only"}
+    [Stekovic et al. 2019](https://doi.org/10.1016/j.cmet.2019.07.016)
+    > "4 weeks of strict alternate day fasting (ADF) improved markers of general health in healthy, middle-aged humans while causing a 37% calorie reduction on average. No adverse effects occurred even after >6 months"
+    {credence: 0.72, reason: "RCT in humans, but small sample and surrogate endpoints only"}
 (2) [Biomarker-Lifespan Link]: Improved cardiovascular and metabolic
     markers predict longer lifespan. #assumption
     {credence: 0.45, reason: "surrogate endpoint assumption; biomarker-outcome links often fail in practice"}
@@ -57,22 +57,19 @@ model:
 
 <Weak Animal Evidence>
 
-(1) [ITP Inconsistency]: The NIA Interventions Testing Program finds IF
-    lifespan results inconsistent across genetically diverse mice. #observation
-    [NIA ITP](https://www.nia.nih.gov/research/dab/interventions-testing-program-itp)
-    > "Caloric restriction remains the gold standard; intermittent fasting protocols tested have shown inconsistent lifespan extension in genetically heterogeneous mice"
-    {credence: 0.85, reason: "ITP is the gold-standard multi-site lifespan testing program"}
-(2) [Circadian Dependency]: Pak et al. 2021 show IF lifespan extension
-    in Drosophila depends on intact circadian clock genes. #observation
-    [Pak et al. 2021](https://doi.org/10.1038/s43587-021-00127-4)
-    > "Time-restricted feeding promotes longevity through circadian clock-mediated improvement of gut homeostasis"
-    {credence: 0.70, reason: "Nature Aging, but Drosophila model limits generalizability"}
-(3) [Translation Challenge]: A 2023 Cell review notes translating
-    model organism lifespan findings to humans is a central challenge
-    in aging research. #observation
-    [Cell 2023](https://doi.org/10.1016/j.cell.2022.12.035)
-    > "Translation of findings from short-lived model organisms to humans remains a central challenge in aging research"
-    {credence: 0.88, reason: "Cell review, well-established problem, applies directly here"}
+(1) [ITP Inconsistency]: The NIA Interventions Testing Program tests
+    agents in genetically heterogeneous mice; IF has not shown consistent
+    lifespan extension in ITP results. #assumption
+    {credence: 0.75, reason: "ITP is the gold-standard multi-site lifespan testing program; IF not among its positive hits"}
+(2) [Circadian Dependency]: Ulgherait et al. 2021 show iTRF lifespan extension
+    in Drosophila requires both circadian regulation and autophagy. #observation
+    [Ulgherait et al. 2021](https://doi.org/10.1038/s41586-021-03934-0)
+    > "iTRF-mediated lifespan extension required both circadian regulation and autophagy, a conserved longevity pathway"
+    {credence: 0.80, reason: "Nature, Drosophila model limits generalizability but mechanism is conserved"}
+(3) [Translation Challenge]: Translating model organism lifespan
+    findings to humans is a well-established challenge in aging
+    research. #assumption
+    {credence: 0.92, reason: "widely accepted in gerontology; different metabolic rates, genetics, and lifespans"}
 (4) [No Human Lifespan Trial]: No RCT has ever measured actual human
     lifespan as an endpoint for any IF protocol. #assumption
     {credence: 0.95, reason: "such a trial would take decades and cost billions; none exists or is planned"}

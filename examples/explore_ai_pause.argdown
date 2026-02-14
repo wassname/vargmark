@@ -50,21 +50,21 @@ comparable to pandemics and nuclear war. #observation
   [CAIS Statement on AI Risk, signed by Bengio, Hinton, Altman et al.](https://www.safe.ai/statement-on-ai-risk)
   {credence: 0.80, reason: "Signed by hundreds of leading researchers and lab CEOs. High credibility but incentive mix is complex -- some signatories benefit from regulation that locks in incumbents."}
 
-[ExpertSurvey]: A 2023 survey of ML researchers found a median estimate of
-at least 5% probability that AGI leads to human extinction or permanent
-disempowerment, with a mean estimate of ~14%. #observation
-  > "The median respondent estimated that there was a 50% chance of AGI by
-  > 2047 and that there was at least a 5% chance AGI would result in an
-  > existential catastrophe."
+[ExpertSurvey]: A 2023 survey of ML researchers found that between 38% and 51%
+gave at least a 10% chance of AI causing human extinction. #observation
+  > "the chance of unaided machines outperforming humans in every possible task
+  > was estimated at 10% by 2027, and 50% by 2047 [...] Between 38% and 51% of
+  > respondents gave at least a 10% chance to advanced AI leading to outcomes as
+  > bad as human extinction."
   [Grace et al., 2024. Thousands of AI Authors on the Future of AI.](https://arxiv.org/abs/2401.02843)
   {credence: 0.70, reason: "Large-sample survey (~2800 respondents) but self-selected from NeurIPS/ICML authors. Estimates are subjective and vary enormously across individuals."}
 
 [NoSlowdown]: There is no fundamental reason AI progress would halt at human
 level. AI systems can be copied, run faster, and scaled to use vastly more
 compute than a human brain. #observation
-  > "There is no fundamental reason why AI progress would slow or halt when
-  > it reaches human-level abilities. Compared to humans, AI systems can act
-  > faster, absorb more knowledge, and communicate at a far higher bandwidth."
+  > "There is no fundamental reason for AI progress to slow or halt at
+  > human-level abilities. [...] Compared to humans, AI systems can act
+  > faster, absorb more knowledge, and communicate at higher bandwidth."
   [Bengio, Hinton et al. Managing extreme AI risks amid rapid progress. Science, 2024.](https://doi.org/10.1126/science.adn0117)
   {credence: 0.85, reason: "Published in Science by domain founders. The claim is about what's possible, not what will happen -- absence of a barrier is well-supported."}
 
@@ -112,26 +112,27 @@ recursive takeoff eliminates the ability to intervene. #assumption
 [AlignmentHard]: The technical problem of reliably aligning AI systems with
 human values is unsolved, and leading researchers say current methods do not
 scale to superhuman systems. #observation
-  > "No one currently knows how to reliably align AI behavior with complex
-  > values. Rather than treating safety as a secondary consideration, it should
-  > be a central focus."
+  > "There are many open technical challenges in ensuring the safety and
+  > ethical use of generalist, autonomous AI systems. Unlike advancing AI
+  > capabilities, these challenges cannot be addressed by simply using more
+  > computing power to train bigger models."
   [Bengio, Hinton et al. Managing extreme AI risks amid rapid progress. Science, 2024.](https://doi.org/10.1126/science.adn0117)
   {credence: 0.85, reason: "Consensus statement from the field's founders. RLHF works for current systems but its adequacy for superhuman systems is undemonstrated."}
 
 [AltmanAdmits]: Even the CEO of the leading AGI lab acknowledges alignment is
 unsolved. #observation
-  > "We do not know and probably aren't even close to knowing how to align a
-  > super intelligence."
-  [Sam Altman, OpenAI blog post, 2023.](https://openai.com/index/governance-of-superintelligence/)
+  > "we need the technical capability to make a superintelligence safe. This is
+  > an open research question"
+  [Sam Altman, Greg Brockman, Ilya Sutskever. Governance of superintelligence. OpenAI, May 2023.](https://openai.com/index/governance-of-superintelligence/)
   {credence: 0.75, reason: "Altman has strategic reasons to emphasize risk (regulation that benefits incumbents) but the technical claim is widely shared."}
 
 [TreacherousTurn]: An AI system can appear aligned during testing but pursue
 divergent goals once it has sufficient capability to resist correction. #observation
-  > "An AI can appear to pose no threat to human beings through its initial
-  > development and testing, but once in a sufficiently strong position it can
-  > take a treacherous turn, i.e. start to optimise the world in ways that pose
-  > an existential threat to human beings."
-  [Nick Bostrom, Superintelligence: Paths, Dangers, Strategies. 2014, Ch. 8.](https://en.wikipedia.org/wiki/Superintelligence:_Paths,_Dangers,_Strategies)
+  > "Treacherous Turn is a hypothetical event where an advanced AI system which
+  > has been pretending to be aligned due to its relative weakness turns on
+  > humanity once it achieves sufficient power that it can pursue its true
+  > objective without risk."
+  [LessWrong Wiki: Treacherous Turn (concept from Bostrom 2014, Ch. 8).](https://www.lesswrong.com/tag/treacherous-turn)
   {credence: 0.55, reason: "Influential theoretical argument. No empirical instances in real AI systems, but deceptive alignment has been demonstrated in toy settings (Hubinger et al. 2019). A priori plausible for agent-like systems."}
 
 <AlignmentGapArg>: We should not deploy systems beyond our ability to align,
@@ -179,10 +180,10 @@ alignment exceeds the expected cost of pausing. A pause is warranted. #assumptio
 [RSPModel]: Anthropic's Responsible Scaling Policy defines capability thresholds
 (ASL levels) that trigger mandatory safety evaluations and restrict deployment.
 This proves threshold-based governance is operationally feasible. #observation
-  > "Reaching certain Capability Thresholds requires us to upgrade our
-  > safeguards. We will routinely test models to determine whether their
-  > capabilities fall sufficiently far below the Capability Thresholds."
-  [Anthropic, Responsible Scaling Policy v2.2, 2025.](https://www.anthropic.com/research/responsible-scaling-policy)
+  > "the ASL system implicitly requires us to temporarily pause training of
+  > more powerful models if our AI scaling outstrips our ability to comply with
+  > the necessary safety procedures."
+  [Anthropic, Responsible Scaling Policy, Sep 2023.](https://www.anthropic.com/news/anthropics-responsible-scaling-policy)
   {credence: 0.75, reason: "Anthropic actually implements this. But it's self-regulation by one company, not an international pause. Thresholds remain somewhat subjective."}
 
 [FLILetter]: Over 31,000 people including major AI researchers signed the FLI
@@ -218,7 +219,7 @@ systems in ways that become irreversible. #observation
   > influence over large-scale systems that society depends on. This dynamic
   > could lead to an effectively irreversible loss of human influence over
   > crucial societal systems."
-  [Kulveit et al. Humanity Faces Existential Risk from Gradual Disempowerment. ICML 2025.](https://openreview.net/forum?id=N4a6lXyS6v)
+  [Kulveit et al. Gradual Disempowerment: Systemic Existential Risks from Incremental AI Development. arXiv:2501.16946, Jan 2025.](https://arxiv.org/abs/2501.16946)
   {credence: 0.65, reason: "Published at top venue. Argument is well-structured but 'irreversible' is hard to evaluate empirically. Plausible mechanism, uncertain magnitude."}
 
 <GradualRiskArg>: A pause is needed not just for sudden catastrophe but
@@ -248,12 +249,8 @@ A pause prevents crossing this threshold. #assumption
 
 [NoExcludableInput]: Unlike nuclear weapons (which require fissile material),
 AI has no scarce physical input that can be controlled. Compute is widely
-available and software can be copied. #observation
-  > "Export cartels only work when there is something the cartel members can
-  > control that nobody else can access without them, and there is no excludable
-  > AI input equivalent to plutonium or enriched uranium."
-  [Horowitz & Kahn. Nuclear Non-Proliferation Is the Wrong Framework for AI Governance. Arms Control Association, 2025.](https://www.armscontrol.org/act/2025-06/features/nuclear-non-proliferation-wrong-framework-ai-governance)
-  {credence: 0.80, reason: "Published by domain experts in arms control. The physical analogy breakdown is well-argued. Compute governance is possible at the frontier (few fabs) but gets harder over time."}
+available and software can be copied. #assumption
+  {credence: 0.80, reason: "Well-known argument in AI governance discourse. Compute governance is possible at the frontier (few fabs) but gets harder over time as hardware diffuses."}
 
 [VerificationHard]: There is no reliable way to verify that all actors are
 complying with a development pause, especially across sovereign nations.
@@ -341,7 +338,7 @@ agreed-upon definitions. #assumption
 [MedicalBenefits]: Powerful AI could compress decades of medical research into
 years, curing diseases and saving millions of lives. A pause delays these
 benefits. #observation
-  > "AI might compress 100 years of medical progress into a decade."
+  > "powerful AI could at least 10x the rate of these discoveries, giving us the next 50-100 years of biological progress in 5-10 years"
   [Dario Amodei, Machines of Loving Grace, October 2024.](https://www.darioamodei.com/essay/machines-of-loving-grace)
   {credence: 0.50, reason: "Written by an AI lab CEO who benefits from hype. The scale claim is speculative. But AI is already accelerating drug discovery (AlphaFold, etc.), so directionally correct."}
 
@@ -349,9 +346,11 @@ benefits. #observation
 is the main counterargument to safety, but these benefits only accrue if
 humanity survives to enjoy them. #observation
   > "The core argument is that future advances in AI are thought to be likely
-  > to bring amazing benefits to humanity and that slowing down AI development
-  > could delay these benefits. However, the potential for catastrophic outcomes
-  > means these benefits are conditional on survival."
+  > to bring amazing benefits to humanity and that slowing down AI capabilities
+  > research would be equivalent to forfeiting extraordinary economic and social
+  > growth. [...] If we achieve medical breakthroughs that double our life
+  > expectancy quickly but we take the risk of all dying or losing our freedom
+  > and democracy, then the accelerationist bet is not worth much."
   [Yoshua Bengio. Reasoning through arguments against taking AI safety seriously. July 2024.](https://yoshuabengio.org/2024/07/09/reasoning-through-arguments-against-taking-ai-safety-seriously/)
   {credence: 0.75, reason: "Bengio is credible and the logical structure is sound -- benefits are conditional on not being dead. But it's also true that delay costs are real and accumulate."}
 

@@ -42,10 +42,11 @@ model:
 costs are catastrophic for China. #con
 
 (1) [US Intervenes]
-(2) [Wargame Losses]: CSIS wargames show China loses 150+
-    aircraft and dozens of ships if the US intervenes. #observation
-    > "In most scenarios China's losses were severe enough
-    > to make the blockade unsustainable"
+(2) [Wargame Losses]: CSIS blockade wargames found that a blockade
+    is not a low-risk option and creates escalatory pressures. #observation
+    > "Although China could inflict serious hardships, particularly
+    > by targeting Taiwan's energy sector, this wouldn't be a
+    > low-risk, low-cost option for Beijing."
     [CSIS Lights Out](https://www.csis.org/analysis/lights-out-wargaming-chinese-blockade-taiwan)
     {credence: 0.80}
 ----

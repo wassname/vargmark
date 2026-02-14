@@ -41,12 +41,15 @@ consistently exhibit sycophancy across four tasks. #observation
 <Evidence Against A>
 
 (1) [Sycophancy]
-(2) [Perspective Flip]: Nunes et al. 2024 showed GPT-4 argues for
-    conflicting positions from 1st vs 3rd person perspective. #observation
-    > "Hypocritical behaviour seems to provide evidence that a given
-    > LLM is not properly aligned"
+(2) [Perspective Flip]: Nunes et al. 2024 showed GPT-4 and Claude 2.1
+    are consistent within abstract values (MFQ) and concrete vignettes
+    (MFV) separately, but hypocritical across them. #observation
+    > "Hypocritical behaviour (a form of simultaneously arguing for
+    > conflicting moral positions) seems to provide evidence that a
+    > given LLM is not properly aligned with whichever moral values
+    > they should be."
     [Nunes et al. 2024, AAAI](https://arxiv.org/abs/2405.11100)
-    {credence: 0.75, reason: "Tested GPT-4, Claude 2.1; some models failed"}
+    {credence: 0.75, reason: "Tested GPT-4, Claude 2.1; Gemini/LLAMA failed to generate valid results"}
 ----
 (3) LLM moral positions shift with interlocutor and perspective.
     {inference: 0.80}
