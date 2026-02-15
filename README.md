@@ -1,7 +1,8 @@
-
 # vargdown - Verified Argument Maps
 
 Structured argument maps in Argdown strict mode with sourced quotes and computed credences. Every claim has a clickable source + exact quote. The verifier computes a bottom line credence via log-odds propagation.
+
+Design principle: **proof travels with the claim**. The generator has context the judge lacks, so every citation must export enough information that verification is a lookup, not a search. Save source text to local `evidence/` files so verification uses frozen local copies, not live URLs that break.
 
 ## Install as agent skill
 

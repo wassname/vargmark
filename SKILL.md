@@ -11,6 +11,23 @@ description: |
 
 Every claim has a clickable source + quote. Premises get credences. Conclusions get inference strengths. The top-level claim is computed, not asserted.
 
+## Design Principle: Proof Travels With the Claim
+
+The generator sees the source text; the judge does not. This information asymmetry means the judge must search the document to verify each quote - O(n) work per claim. Vargdown closes this gap by requiring the generator to export proof alongside every claim: a URL, an exact quote, and a frozen local copy of the source.
+
+**Concretely:** when fetching a source, save the relevant text to a local `evidence/` file (e.g. `evidence/smith2024.md`). Record the original URL at the top of that file. Then cite the local file: `[Smith 2024](evidence/smith2024.md)` with `> "exact quote"`. The verifier checks the quote against the local file, not against a live URL that may break, block, or change.
+
+For extra tamper-evidence, note the SHA-256 hash of the evidence file in a comment. For web sources, you can also append a [text fragment](https://web.dev/articles/text-fragments) to the original URL (`#:~:text=quote`) as a secondary check, but the local file is primary.
+
+The rule: every citation should make verification a lookup, not a search. Match verification depth to claim importance - routine observations get automated checks, load-bearing cruxes deserve human or sub-agent review.
+
+<!-- TODO: implement evidence/ workflow in argmap.py verifier:
+  - auto-save fetched source text to evidence/ when generating observations
+  - verifier checks quote against local evidence file instead of live URL
+  - SHA-256 hash verification for tamper detection
+  - text-fragment URL generation as secondary check
+-->
+
 ## Complete Example
 
 This skill document is itself a vargdown argument. Study the format, then read the rules.
@@ -86,8 +103,8 @@ model:
 
 Output: `[Closes Gap]` implied credence ~66% (+0.67 log-odds; pro outweighs con for complex claims).
 
-
 ---
+
 ## Verification
 
 Run the verifier script after writing. Fix errors until it passes:
@@ -103,22 +120,20 @@ The verifier checks: credence consistency, PCS math, graph structure, and contra
 
 ## Tags
 
-| Tag | Meaning |
-|-----|---------|
-| `#observation` | Sourced claim (needs URL + quote) |
-| `#assumption` | Unsourced belief |
-| `#crux` | Sub-question that determines the main answer |
-| `#prior` | Base rate or reference class |
-| `#mechanism` | Explanation of how/why |
-| `#cluster-X` | Correlated arguments (shared evidence) |
-
-
+| Tag            | Meaning                                      |
+| -------------- | -------------------------------------------- |
+| `#observation` | Sourced claim (needs URL + quote)            |
+| `#assumption`  | Unsourced belief                             |
+| `#crux`        | Sub-question that determines the main answer |
+| `#prior`       | Base rate or reference class                 |
+| `#mechanism`   | Explanation of how/why                       |
+| `#cluster-X`   | Correlated arguments (shared evidence)       |
 
 ## Key Rules (deviations from standard Argdown)
 
-1. **`{credence: X}`** on premises = trust in source (0-1). **`{inference: X}`** on conclusions = reasoning strength given premises (0-1). Never write `{credence}` on a conclusion. Example: `{credence: 0.7}` on a premise, `{inference: 0.6}` on its conclusion. The conclusion's credence is *computed*: `product(premise credences) * inference`, aggregated via log-odds.
+1. **`{credence: X}`** on premises = trust in source (0-1). **`{inference: X}`** on conclusions = reasoning strength given premises (0-1). Never write `{credence}` on a conclusion. Example: `{credence: 0.7}` on a premise, `{inference: 0.6}` on its conclusion. The conclusion's credence is _computed_: `product(premise credences) * inference`, aggregated via log-odds.
 2. **Top-level claim** gets NO hardcoded credence. It's computed via log-odds aggregation.
-3. **`#observation`** premises MUST have: `[Label](url)` link + `> "exact quote"` blockquote.
+3. **`#observation`** premises MUST have: `[Label](url_or_evidence_file)` link + `> "exact quote"` blockquote. Save source text to `evidence/` so verification uses a frozen local copy, not a live URL.
 4. **`#assumption`** premises need `{credence: X, reason: "..."}` but no URL.
 5. **ALL conclusions** must be named: `(3) [Name]: text`. Never bare sentences.
 6. **`{reason: "..."}`** is required on every credence and inference value.
@@ -274,7 +289,6 @@ Tag with `#cluster-X` to flag shared evidence base:
 
 ---
 
-
 ---
 
 ## Ensemble Mode
@@ -302,16 +316,15 @@ To compare two agents' argument maps on the same topic:
 
 ## Common Mistakes
 
-| Mistake | Fix |
-|---------|-----|
-| `{credence: X}` on a conclusion | `{inference: X}` -- credence is computed |
-| `{credence: X}` on top-level claim | Remove -- computed via log-odds |
-| Unnamed conclusion `(3) Some text.` | `(3) [Name]: Some text.` |
-| No URL on `#observation` | Every observation needs `[Label](url)` |
-| Blockquote is vague or a paper title | Find a specific declarative finding |
-| Paraphrasing in blockquote | Use exact text; if paraphrasing: `> "paraphrase: ..."` and lower credence |
-| Multi-sentence inference | Split into sub-arguments (Pattern 5) |
-| Missing `{reason: "..."}` | Always explain why this number |
-| `[brackets]` in blockquotes | Escape as `\[text\]` -- parser treats `[x]` as statement refs |
-| Using `><` for contradiction | Use mutual `- [other]` contraries (see Pattern 4) |
-
+| Mistake                              | Fix                                                                       |
+| ------------------------------------ | ------------------------------------------------------------------------- |
+| `{credence: X}` on a conclusion      | `{inference: X}` -- credence is computed                                  |
+| `{credence: X}` on top-level claim   | Remove -- computed via log-odds                                           |
+| Unnamed conclusion `(3) Some text.`  | `(3) [Name]: Some text.`                                                  |
+| No URL on `#observation`             | Every observation needs `[Label](url)`                                    |
+| Blockquote is vague or a paper title | Find a specific declarative finding                                       |
+| Paraphrasing in blockquote           | Use exact text; if paraphrasing: `> "paraphrase: ..."` and lower credence |
+| Multi-sentence inference             | Split into sub-arguments (Pattern 5)                                      |
+| Missing `{reason: "..."}`            | Always explain why this number                                            |
+| `[brackets]` in blockquotes          | Escape as `\[text\]` -- parser treats `[x]` as statement refs             |
+| Using `><` for contradiction         | Use mutual `- [other]` contraries (see Pattern 4)                         |
