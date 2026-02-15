@@ -127,6 +127,38 @@ def check_graph(statements: dict, relations: list, data: dict) -> list[str]:
     return errors
 
 
+def check_field_ordering(data: dict) -> list[str]:
+    """Check that 'reason' comes before 'credence'/'inference' in data fields.
+    
+    Principle 1c: reason first, credence second.
+    JSON preserves insertion order from argdown source, so key order = source order.
+    """
+    errors = []
+    # Check statements
+    for title, ec in data.get("statements", {}).items():
+        d = ec.get("data", {})
+        keys = list(d.keys())
+        if "reason" in keys and ("credence" in keys or "inference" in keys):
+            reason_idx = keys.index("reason")
+            num_idx = keys.index("credence") if "credence" in keys else keys.index("inference")
+            if reason_idx > num_idx:
+                field = "credence" if "credence" in keys else "inference"
+                errors.append(f"ORDERING: [{title}] has {{{field}}} before {{reason}} -- reason must come first")
+    # Check PCS members
+    for arg_name, arg in data.get("arguments", {}).items():
+        for m in arg.get("pcs", []):
+            d = m.get("data", {})
+            keys = list(d.keys())
+            if "reason" in keys and ("credence" in keys or "inference" in keys):
+                reason_idx = keys.index("reason")
+                num_idx = keys.index("credence") if "credence" in keys else keys.index("inference")
+                if reason_idx > num_idx:
+                    field = "credence" if "credence" in keys else "inference"
+                    title = m.get("title", arg_name)
+                    errors.append(f"ORDERING: [{title}] in <{arg_name}> has {{{field}}} before {{reason}} -- reason must come first")
+    return errors
+
+
 def check_pcs_credences(data: dict, statements: dict) -> tuple[list[str], list[str]]:
     """Compute conclusion credences from premises * inference strength.
 
@@ -273,6 +305,7 @@ def verify(data: dict) -> tuple[int, dict, list]:
     all_errors += check_credence_consistency(statements, relations)
     all_errors += check_math(statements)
     all_errors += check_graph(statements, relations, data)
+    all_errors += check_field_ordering(data)
 
     # PCS must run before propagation -- computes conclusion credences
     pcs_errors, pcs_notes = check_pcs_credences(data, statements)
@@ -345,6 +378,44 @@ def extract_link(premise: dict) -> tuple[str | None, str | None]:
     return None, None
 
 
+import re
+
+def read_evidence(url: str, base_dir: Path) -> str | None:
+    """Read referenced lines from a local evidence file.
+    
+    Supports:
+      evidence/paper.md#L42      -> line 42
+      evidence/paper.md#L42-L55  -> lines 42-55
+      evidence/paper.md          -> first 10 lines (preview)
+    
+    Returns extracted text or None if file not found / not a local evidence path.
+    """
+    if not url or not url.startswith("evidence/"):
+        return None
+    
+    # Split path and fragment
+    if "#" in url:
+        file_part, fragment = url.split("#", 1)
+    else:
+        file_part, fragment = url, ""
+    
+    filepath = base_dir / file_part
+    if not filepath.exists():
+        return None
+    
+    lines = filepath.read_text().splitlines()
+    
+    # Parse line fragment: L42 or L42-L55
+    m = re.match(r"L(\d+)(?:-L(\d+))?$", fragment)
+    if m:
+        start = int(m.group(1)) - 1  # 1-indexed to 0-indexed
+        end = int(m.group(2)) if m.group(2) else start + 1
+        return "\n".join(lines[start:end])
+    
+    # No fragment or unrecognized: return first 10 lines as preview
+    return "\n".join(lines[:10]) + ("\n..." if len(lines) > 10 else "")
+
+
 def extract_quote(text: str) -> str | None:
     """Extract blockquote content from premise text."""
     for marker in ('>"', "> "):
@@ -361,7 +432,7 @@ def conclusion_relation(conc_title: str, relations: list[dict]) -> tuple[str, st
     return None
 
 
-def render_argument(arg_name: str, arg: dict, statements: dict, relations: list[dict]) -> str:
+def render_argument(arg_name: str, arg: dict, statements: dict, relations: list[dict], base_dir: Path | None = None) -> str:
     pcs = arg.get("pcs", [])
     if not pcs:
         return ""
@@ -415,6 +486,15 @@ def render_argument(arg_name: str, arg: dict, statements: dict, relations: list[
             lines.append(f'<div class="source-line">{" ".join(source_parts)}</div>')
         elif credence is not None:
             lines.append(f'<div class="source-line">{render_credence(credence, "credence", reason)}</div>')
+        
+        # Evidence file inline: read referenced lines and show as expandable
+        if link_url and base_dir:
+            evidence_text = read_evidence(link_url, base_dir)
+            if evidence_text:
+                lines.append(
+                    f'<details class="evidence-inline"><summary>source text</summary>'
+                    f'<pre>{escape(evidence_text)}</pre></details>'
+                )
         lines.append('</div>')
 
     # Inference step text + inference strength (from expanded inference rules on the conclusion)
@@ -465,7 +545,7 @@ def render_argument(arg_name: str, arg: dict, statements: dict, relations: list[
     return "\n".join(lines)
 
 
-def render_html(data: dict, statements: dict, relations: list, argdown_source: str | None = None) -> str:
+def render_html(data: dict, statements: dict, relations: list, argdown_source: str | None = None, base_dir: Path | None = None) -> str:
     """Render full HTML page. Takes pre-computed statements (with credences) and relations."""
     top_level = [
         (t, ec) for t, ec in data.get("statements", {}).items()
@@ -538,6 +618,12 @@ details.source-code pre {{
     background: #f6f8fa; padding: 1em; border-radius: 4px;
     overflow-x: auto; font-size: 0.8em; line-height: 1.4;
 }}
+details.evidence-inline {{ margin: 0.3em 0 0.3em 2em; font-size: 0.85em; }}
+details.evidence-inline summary {{ cursor: pointer; color: #888; font-size: 0.9em; }}
+details.evidence-inline pre {{
+    background: #fffbe6; padding: 0.8em; border-radius: 4px; border-left: 3px solid #e6c200;
+    overflow-x: auto; font-size: 0.85em; line-height: 1.4; white-space: pre-wrap;
+}}
 </style>
 </head>
 <body>
@@ -569,7 +655,7 @@ details.source-code pre {{
         if section_title:
             html += f'<h2>{escape(section_title)}</h2>\n'
         for arg_name, arg in args:
-            html += render_argument(arg_name, arg, statements, relations)
+            html += render_argument(arg_name, arg, statements, relations, base_dir)
 
     if argdown_source:
         html += '<details class="source-code">\n<summary>Raw argdown source</summary>\n'
@@ -608,9 +694,10 @@ def main():
         if argdown_path.exists():
             argdown_source = argdown_path.read_text()
 
-    # Render
+    # Render -- base_dir is the directory containing the input file (for evidence/ resolution)
     output = args.output or "example_verified.html"
-    Path(output).write_text(render_html(data, statements, relations, argdown_source))
+    base_dir = Path(args.input).parent if args.input else Path(".")
+    Path(output).write_text(render_html(data, statements, relations, argdown_source, base_dir))
     print(f"\nRendered to {output}")
 
     sys.exit(exit_code)

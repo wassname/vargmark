@@ -1,16 +1,19 @@
 # vargdown - Verified Argument Maps
 
-Structured argument maps in Argdown strict mode with sourced quotes and computed credences. Every claim has a clickable source + exact quote. The verifier computes a bottom line credence via log-odds propagation.
+Structured argument maps where every claim has a clickable source + exact quote, and the bottom line is computed via log-odds, not asserted.
 
-Design principle: **proof travels with the claim**. The generator has context the judge lacks, so every citation must export enough information that verification is a lookup, not a search. Save source text to local `evidence/` files so verification uses frozen local copies, not live URLs that break.
+## Principles
+
+**Machine-check what you can; make the rest judgeable at the right level.**
+
+- **1a. Proof travels with the claim.** Every observation exports URL + exact quote + frozen local copy (`evidence/`). The judge never searches -- it's right there.
+- **1b. Observations have sources; inferences have reasons.** Each step is one or the other, never mixed. Observations are checked against their source; inferences against reasoning and stated credence.
+- **1c. Reason first, credence second; bottom line is computed, never stated.** State why before how-much. The top-level claim falls out of the math.
 
 ## Install as agent skill
 
 ```bash
-# OpenCode
-ln -s /path/to/this/repo ~/.config/opencode/skills/vargdown
-
-# Claude Code
+# Claude Code / OpenCode
 ln -s /path/to/this/repo ~/.claude/skills/vargdown
 ```
 
@@ -32,7 +35,7 @@ Requires `uv` (Python deps), `just`, and `npx` (argdown CLI).
 3. Verifier checks: credence consistency, source attribution, inference math, graph structure
 4. Output: HTML with colored cards, computed credences, and a bottom line number
 
-See `examples/` for working argument maps.
+See `examples/` for working argument maps. See [AGENTS.md](AGENTS.md) for the dev workflow.
 
 ## References
 

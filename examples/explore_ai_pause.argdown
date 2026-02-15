@@ -48,25 +48,25 @@ comparable to pandemics and nuclear war. #observation
   > "Mitigating the risk of extinction from AI should be a global priority
   > alongside other societal-scale risks such as pandemics and nuclear war."
   [CAIS Statement on AI Risk, signed by Bengio, Hinton, Altman et al.](https://www.safe.ai/statement-on-ai-risk)
-  {credence: 0.80, reason: "Signed by hundreds of leading researchers and lab CEOs. High credibility but incentive mix is complex -- some signatories benefit from regulation that locks in incumbents."}
+  {reason: "Signed by hundreds of leading researchers and lab CEOs. High credibility but incentive mix is complex -- some signatories benefit from regulation that locks in incumbents.", credence: 0.80}
 
 [ExpertSurvey]: A 2023 survey of ML researchers found that between 38% and 51%
 gave at least a 10% chance of AI causing human extinction. #observation
   > "the chance of unaided machines outperforming humans in every possible task
-  > was estimated at 10% by 2027, and 50% by 2047 [...] Between 38% and 51% of
+  > was estimated at 10% by 2027, and 50% by 2047 (...) Between 38% and 51% of
   > respondents gave at least a 10% chance to advanced AI leading to outcomes as
   > bad as human extinction."
   [Grace et al., 2024. Thousands of AI Authors on the Future of AI.](https://arxiv.org/abs/2401.02843)
-  {credence: 0.70, reason: "Large-sample survey (~2800 respondents) but self-selected from NeurIPS/ICML authors. Estimates are subjective and vary enormously across individuals."}
+  {reason: "Large-sample survey (~2800 respondents) but self-selected from NeurIPS/ICML authors. Estimates are subjective and vary enormously across individuals.", credence: 0.70}
 
 [NoSlowdown]: There is no fundamental reason AI progress would halt at human
 level. AI systems can be copied, run faster, and scaled to use vastly more
 compute than a human brain. #observation
   > "There is no fundamental reason for AI progress to slow or halt at
-  > human-level abilities. [...] Compared to humans, AI systems can act
+  > human-level abilities. (...) Compared to humans, AI systems can act
   > faster, absorb more knowledge, and communicate at higher bandwidth."
   [Bengio, Hinton et al. Managing extreme AI risks amid rapid progress. Science, 2024.](https://doi.org/10.1126/science.adn0117)
-  {credence: 0.85, reason: "Published in Science by domain founders. The claim is about what's possible, not what will happen -- absence of a barrier is well-supported."}
+  {reason: "Published in Science by domain founders. The claim is about what's possible, not what will happen -- absence of a barrier is well-supported.", credence: 0.85}
 
 <ExistentialRiskArg>: The risk of extinction from advanced AI is nontrivial
 and acknowledged by domain experts. #pro
@@ -92,14 +92,14 @@ via recursive self-improvement, making the window for intervention very short.
 (2) [RecursiveSelfImprovement]: A sufficiently capable AI system could improve
 its own training, architecture, or data pipeline, leading to a rapid capability
 gain ("intelligence explosion"). #assumption
-  {credence: 0.50, reason: "Theoretical argument from Good (1965) and Bostrom (2014). No empirical examples yet. Current AI can assist in ML research but full recursive loop is undemonstrated."}
+  {reason: "Theoretical argument from Good (1965) and Bostrom (2014). No empirical examples yet. Current AI can assist in ML research but full recursive loop is undemonstrated.", credence: 0.50}
 ----
 (3) [IntelligenceExplosion]: Once AI exceeds human cognitive ability, recursive
 self-improvement could produce a rapid jump to far-superhuman capability. #assumption
   {inference: 0.40}
 (4) [NarrowWindow]: The window between 'slightly superhuman' and 'far
 superhuman' may be too short for human intervention. #assumption
-  {credence: 0.35, reason: "Speculative. Depends on speed of recursive improvement, which could be fast (Bostrom) or bottlenecked by compute/data/validation. Low but nonzero."}
+  {reason: "Speculative. Depends on speed of recursive improvement, which could be fast (Bostrom) or bottlenecked by compute/data/validation. Low but nonzero.", credence: 0.35}
 ----
 (5) [FOOMConclusion]: A pause at 150% gives a safety margin before potential
 recursive takeoff eliminates the ability to intervene. #assumption
@@ -117,14 +117,14 @@ scale to superhuman systems. #observation
   > capabilities, these challenges cannot be addressed by simply using more
   > computing power to train bigger models."
   [Bengio, Hinton et al. Managing extreme AI risks amid rapid progress. Science, 2024.](https://doi.org/10.1126/science.adn0117)
-  {credence: 0.85, reason: "Consensus statement from the field's founders. RLHF works for current systems but its adequacy for superhuman systems is undemonstrated."}
+  {reason: "Consensus statement from the field's founders. RLHF works for current systems but its adequacy for superhuman systems is undemonstrated.", credence: 0.85}
 
 [AltmanAdmits]: Even the CEO of the leading AGI lab acknowledges alignment is
 unsolved. #observation
   > "we need the technical capability to make a superintelligence safe. This is
   > an open research question"
   [Sam Altman, Greg Brockman, Ilya Sutskever. Governance of superintelligence. OpenAI, May 2023.](https://openai.com/index/governance-of-superintelligence/)
-  {credence: 0.75, reason: "Altman has strategic reasons to emphasize risk (regulation that benefits incumbents) but the technical claim is widely shared."}
+  {reason: "Altman has strategic reasons to emphasize risk (regulation that benefits incumbents) but the technical claim is widely shared.", credence: 0.75}
 
 [TreacherousTurn]: An AI system can appear aligned during testing but pursue
 divergent goals once it has sufficient capability to resist correction. #observation
@@ -133,7 +133,7 @@ divergent goals once it has sufficient capability to resist correction. #observa
   > humanity once it achieves sufficient power that it can pursue its true
   > objective without risk."
   [LessWrong Wiki: Treacherous Turn (concept from Bostrom 2014, Ch. 8).](https://www.lesswrong.com/tag/treacherous-turn)
-  {credence: 0.55, reason: "Influential theoretical argument. No empirical instances in real AI systems, but deceptive alignment has been demonstrated in toy settings (Hubinger et al. 2019). A priori plausible for agent-like systems."}
+  {reason: "Influential theoretical argument. No empirical instances in real AI systems, but deceptive alignment has been demonstrated in toy settings (Hubinger et al. 2019). A priori plausible for agent-like systems.", credence: 0.55}
 
 <AlignmentGapArg>: We should not deploy systems beyond our ability to align,
 and alignment is currently inadequate for superhuman AI. #pro
@@ -156,7 +156,7 @@ human level reckless without a pause. #assumption
 [AsymmetricDownside]: The downside of unaligned superhuman AI (extinction) is
 categorically worse than the downside of pausing (delayed progress). Expected
 value reasoning favors caution even at low probabilities. #assumption
-  {credence: 0.80, reason: "Standard expected-value argument. Even 5% x extinction = enormous expected disvalue. Contested by those who weight opportunity costs heavily or discount speculative risks."}
+  {reason: "Standard expected-value argument. Even 5% x extinction = enormous expected disvalue. Contested by those who weight opportunity costs heavily or discount speculative risks.", credence: 0.80}
 
 <PrecautionArg>: When the downside is extinction and the probability is
 nontrivial, the burden of proof falls on those who want to proceed, not those
@@ -184,7 +184,7 @@ This proves threshold-based governance is operationally feasible. #observation
   > more powerful models if our AI scaling outstrips our ability to comply with
   > the necessary safety procedures."
   [Anthropic, Responsible Scaling Policy, Sep 2023.](https://www.anthropic.com/news/anthropics-responsible-scaling-policy)
-  {credence: 0.75, reason: "Anthropic actually implements this. But it's self-regulation by one company, not an international pause. Thresholds remain somewhat subjective."}
+  {reason: "Anthropic actually implements this. But it's self-regulation by one company, not an international pause. Thresholds remain somewhat subjective.", credence: 0.75}
 
 [FLILetter]: Over 31,000 people including major AI researchers signed the FLI
 open letter calling for a pause on training systems more powerful than GPT-4.
@@ -192,7 +192,7 @@ open letter calling for a pause on training systems more powerful than GPT-4.
   > "We call on all AI labs to immediately pause for at least 6 months the
   > training of AI systems more powerful than GPT-4."
   [Future of Life Institute, Pause Giant AI Experiments, March 2023.](https://futureoflife.org/open-letter/pause-giant-ai-experiments/)
-  {credence: 0.60, reason: "Large signature count shows widespread concern. But no lab actually paused, the 6-month threshold was arbitrary, and many signatories had mixed motives."}
+  {reason: "Large signature count shows widespread concern. But no lab actually paused, the 6-month threshold was arbitrary, and many signatories had mixed motives.", credence: 0.60}
 
 <PrecedentArg>: Capability-triggered governance is not just theoretical --
 industry is already implementing threshold-based safety frameworks. A pause
@@ -220,7 +220,7 @@ systems in ways that become irreversible. #observation
   > could lead to an effectively irreversible loss of human influence over
   > crucial societal systems."
   [Kulveit et al. Gradual Disempowerment: Systemic Existential Risks from Incremental AI Development. arXiv:2501.16946, Jan 2025.](https://arxiv.org/abs/2501.16946)
-  {credence: 0.65, reason: "Published at top venue. Argument is well-structured but 'irreversible' is hard to evaluate empirically. Plausible mechanism, uncertain magnitude."}
+  {reason: "Published at top venue. Argument is well-structured but 'irreversible' is hard to evaluate empirically. Plausible mechanism, uncertain magnitude.", credence: 0.65}
 
 <GradualRiskArg>: A pause is needed not just for sudden catastrophe but
 because gradual capability gains past human level can irreversibly erode
@@ -250,12 +250,12 @@ A pause prevents crossing this threshold. #assumption
 [NoExcludableInput]: Unlike nuclear weapons (which require fissile material),
 AI has no scarce physical input that can be controlled. Compute is widely
 available and software can be copied. #assumption
-  {credence: 0.80, reason: "Well-known argument in AI governance discourse. Compute governance is possible at the frontier (few fabs) but gets harder over time as hardware diffuses."}
+  {reason: "Well-known argument in AI governance discourse. Compute governance is possible at the frontier (few fabs) but gets harder over time as hardware diffuses.", credence: 0.80}
 
 [VerificationHard]: There is no reliable way to verify that all actors are
 complying with a development pause, especially across sovereign nations.
 #assumption
-  {credence: 0.75, reason: "International AI governance lacks anything like IAEA inspections. Compute auditing is a research area but immature. Covert training runs are hard to detect."}
+  {reason: "International AI governance lacks anything like IAEA inspections. Compute auditing is a research area but immature. Covert training runs are hard to detect.", credence: 0.75}
 
 <EnforcementArg>: A global pause on AI development at any threshold is
 unenforceable because AI lacks excludable physical inputs and compliance
@@ -278,12 +278,12 @@ enforced with current institutions and technology. #assumption
 [RaceDynamics]: If democratic nations pause but authoritarian regimes do not,
 the pause hands a decisive strategic advantage to actors with worse safety
 practices and values. #assumption
-  {credence: 0.70, reason: "Standard geopolitical argument. China's AI investment is real. But current frontier labs are Western, and China may also want safety. The 'race' framing is itself contested."}
+  {reason: "Standard geopolitical argument. China's AI investment is real. But current frontier labs are Western, and China may also want safety. The 'race' framing is itself contested.", credence: 0.70}
 
 [StrategicWeapon]: Advanced AI is a transformative military and economic
 technology. Ceding leadership in it has consequences beyond the AI domain.
 #assumption
-  {credence: 0.65, reason: "Plausible in the current geopolitical environment. But 'strategic advantage' from AI is speculative and may not be winner-take-all."}
+  {reason: "Plausible in the current geopolitical environment. But 'strategic advantage' from AI is speculative and may not be winner-take-all.", credence: 0.65}
 
 <CompetitiveArg>: A unilateral pause by responsible actors cedes the
 development of superhuman AI to less safety-conscious actors, making the world
@@ -308,12 +308,12 @@ actors with worse safety practices, increasing net risk. #assumption
 let alone "150% of human-level." Different tasks have different scales and
 AI already vastly exceeds humans in some domains while lagging in others.
 #assumption
-  {credence: 0.85, reason: "This is basically a definitional problem. No existing benchmark corresponds to 'general human-level intelligence.' ARC-AGI, GPQA, etc. measure narrow slices."}
+  {reason: "This is basically a definitional problem. No existing benchmark corresponds to 'general human-level intelligence.' ARC-AGI, GPQA, etc. measure narrow slices.", credence: 0.85}
 
 [ArbitraryMultiplier]: The "150%" multiplier has no principled basis.
 Why not 120%? Why not 200%? The choice of threshold is not grounded in
 any theory of where risk discontinuities lie. #assumption
-  {credence: 0.80, reason: "Fair criticism. There's no theoretical model predicting a phase transition at exactly 1.5x human capability. Any specific number is a Schelling point, not a derived quantity."}
+  {reason: "Fair criticism. There's no theoretical model predicting a phase transition at exactly 1.5x human capability. Any specific number is a Schelling point, not a derived quantity.", credence: 0.80}
 
 <ArbitraryThresholdArg>: The 150% threshold is meaningless without a
 measurable definition of "human-level" and without a theory of why risk
@@ -340,7 +340,7 @@ years, curing diseases and saving millions of lives. A pause delays these
 benefits. #observation
   > "powerful AI could at least 10x the rate of these discoveries, giving us the next 50-100 years of biological progress in 5-10 years"
   [Dario Amodei, Machines of Loving Grace, October 2024.](https://www.darioamodei.com/essay/machines-of-loving-grace)
-  {credence: 0.50, reason: "Written by an AI lab CEO who benefits from hype. The scale claim is speculative. But AI is already accelerating drug discovery (AlphaFold, etc.), so directionally correct."}
+  {reason: "Written by an AI lab CEO who benefits from hype. The scale claim is speculative. But AI is already accelerating drug discovery (AlphaFold, etc.), so directionally correct.", credence: 0.50}
 
 [BengioCounterpoint]: The argument that AI benefits are too important to pause
 is the main counterargument to safety, but these benefits only accrue if
@@ -348,11 +348,11 @@ humanity survives to enjoy them. #observation
   > "The core argument is that future advances in AI are thought to be likely
   > to bring amazing benefits to humanity and that slowing down AI capabilities
   > research would be equivalent to forfeiting extraordinary economic and social
-  > growth. [...] If we achieve medical breakthroughs that double our life
+  > growth. (...) If we achieve medical breakthroughs that double our life
   > expectancy quickly but we take the risk of all dying or losing our freedom
   > and democracy, then the accelerationist bet is not worth much."
   [Yoshua Bengio. Reasoning through arguments against taking AI safety seriously. July 2024.](https://yoshuabengio.org/2024/07/09/reasoning-through-arguments-against-taking-ai-safety-seriously/)
-  {credence: 0.75, reason: "Bengio is credible and the logical structure is sound -- benefits are conditional on not being dead. But it's also true that delay costs are real and accumulate."}
+  {reason: "Bengio is credible and the logical structure is sound -- benefits are conditional on not being dead. But it's also true that delay costs are real and accumulate.", credence: 0.75}
 
 <OpportunityCostArg>: A pause at 150% delays enormous benefits in medicine,
 science, and economics. These are real costs measured in lives and suffering.
@@ -365,7 +365,7 @@ science, and economics. These are real costs measured in lives and suffering.
 (2) [PauseDelaysConcrete]: Every year of pause delays AI-assisted drug
 discovery, climate modeling, and scientific research, with concrete human costs.
 #assumption
-  {credence: 0.70, reason: "True as stated. But the magnitude depends on how much acceleration AI provides over the counterfactual, and whether the pause is total or just past 150%."}
+  {reason: "True as stated. But the magnitude depends on how much acceleration AI provides over the counterfactual, and whether the pause is total or just past 150%.", credence: 0.70}
 ----
 (3) [OpportunityCost]: The opportunity cost of pausing advanced AI runs into
 millions of quality-adjusted life-years per year of delay. #assumption
@@ -395,12 +395,12 @@ argument's force. #assumption
 [RSPBetter]: Anthropic-style tiered safety levels (ASL-1 through ASL-4+)
 that ratchet up safeguards with capability are more practical than a binary
 pause. They allow continued development under increasing scrutiny. #assumption
-  {credence: 0.65, reason: "The RSP model is actually being implemented. But it's voluntary self-regulation by one company -- no enforcement mechanism for the industry as a whole."}
+  {reason: "The RSP model is actually being implemented. But it's voluntary self-regulation by one company -- no enforcement mechanism for the industry as a whole.", credence: 0.65}
 
 [IteratedGovernance]: A hard pause is politically unrealistic and brittle.
 Graduated, iterated governance can adapt as capabilities and our understanding
 of risk evolve. #assumption
-  {credence: 0.70, reason: "Pragmatic argument. Most governance regimes are iterative (financial regulation, environmental law). But iterative approaches can fail to keep up with exponential capability gains."}
+  {reason: "Pragmatic argument. Most governance regimes are iterative (financial regulation, environmental law). But iterative approaches can fail to keep up with exponential capability gains.", credence: 0.70}
 
 <GraduatedApproachArg>: A graduated, threshold-triggered safety regime is
 strictly superior to a binary pause: it captures the benefits of capability

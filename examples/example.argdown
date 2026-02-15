@@ -30,7 +30,7 @@ Monotonic separability suggests probes track genuine feature quality
 --
 (3) [Probes Valid]: Linear probes reveal genuine structure in
     neural network representations.
-    {inference: 0.92, reason: "direct implication if both premises hold"}
+    {reason: "direct implication if both premises hold", inference: 0.92}
   +> [Reliable]
 
 # Evidence Against
@@ -53,5 +53,5 @@ High accuracy alone is insufficient evidence of encoding
 --
 (3) [Probes Mislead]: High probe accuracy may not reliably indicate
     that a representation genuinely encodes a property.
-    {inference: 0.51, reason: "shows problems exist but doesn't prove probes are useless"}
+    {reason: "shows problems exist but doesn't prove probes are useless", inference: 0.51}
   -> [Reliable]

@@ -9,28 +9,44 @@ description: |
 
 # Verified Argument Maps (v-argdown)
 
-Every claim has a clickable source + quote. Premises get credences. Conclusions get inference strengths. The top-level claim is computed, not asserted.
+Structured argument maps where every claim has a clickable source + exact quote, premises get credences, conclusions get inference strengths, and the bottom line is computed, not asserted.
 
-## Design Principle: Proof Travels With the Claim
+## Usage
 
-The generator sees the source text; the judge does not. This information asymmetry means the judge must search the document to verify each quote - O(n) work per claim. Vargdown closes this gap by requiring the generator to export proof alongside every claim: a URL, an exact quote, and a frozen local copy of the source.
+1. Write `.argdown` file following this format
+2. Verify and fix errors until clean
+3. Have a sub-agent review it: check all links resolve, skeptically review all reasoning, inference values, and credence assignments
+4. (optional) Render to HTML with colored cards and computed credences
 
-**Concretely:** when fetching a source, save the relevant text to a local `evidence/` file (e.g. `evidence/smith2024.md`). Record the original URL at the top of that file. Then cite the local file: `[Smith 2024](evidence/smith2024.md)` with `> "exact quote"`. The verifier checks the quote against the local file, not against a live URL that may break, block, or change.
+```bash
+# with just (if available)
+just verify <stem>
+just render <stem>
 
-For extra tamper-evidence, note the SHA-256 hash of the evidence file in a comment. For web sources, you can also append a [text fragment](https://web.dev/articles/text-fragments) to the original URL (`#:~:text=quote`) as a secondary check, but the local file is primary.
+# without just
+npx @argdown/cli json <stem>.argdown "$(dirname <stem>)"
+uv run --with sympy --with networkx python argmap.py <stem>.json --verify-only   # verify
+uv run --with sympy --with networkx python argmap.py <stem>.json <stem>_verified.html  # render
+```
 
-The rule: every citation should make verification a lookup, not a search. Match verification depth to claim importance - routine observations get automated checks, load-bearing cruxes deserve human or sub-agent review.
+## Principles
 
-<!-- TODO: implement evidence/ workflow in argmap.py verifier:
-  - auto-save fetched source text to evidence/ when generating observations
-  - verifier checks quote against local evidence file instead of live URL
-  - SHA-256 hash verification for tamper detection
-  - text-fragment URL generation as secondary check
--->
+**Machine-check what you can; make the rest judgeable at the right level.**
 
-## Complete Example
+The format lets machines verify the mechanical (quote matching, arithmetic, graph structure), weaker models verify the intermediate (inference plausibility, source relevance), and humans verify the cruxes -- each with minimal work per node.
 
-This skill document is itself a vargdown argument. Study the format, then read the rules.
+**1a. Proof travels with the claim.**
+Every observation exports URL + exact quote + frozen local copy. The judge never searches for evidence -- it's right there. Save source text to `evidence/` so verification uses a frozen copy, not a live URL that may break or change.
+
+**1b. Observations have sources; inferences have reasons.**
+Observations are checked against their source quote. Inferences are checked against reasoning and stated credence. Each step is one or the other, never mixed.
+
+**1c. Reason first, credence second; bottom line is computed, never stated.**
+State why before how-much -- reasoning to a number, not post-hoc rationalization. Write `{reason: "...", credence: X}` not `{credence: X, reason: "..."}`. Conclusion credence = product(premise credences) * inference. The top-level claim falls out of the math.
+
+## Example
+
+This skill document argues for itself. Study the format, then read the rules below.
 
 ```argdown
 ===
@@ -54,16 +70,16 @@ model:
     agents argue opposing sides and a judge evaluates. #observation
     [Irving et al. 2018](https://arxiv.org/abs/1805.00899)
     > "we propose training agents via self play on a zero sum debate game"
-    {credence: 0.75, reason: "influential but empirical validation is limited"}
+    {reason: "influential but empirical validation is limited", credence: 0.75}
 (2) [Oversight]: Bowman et al. 2022 argue scalable oversight requires
     decomposing arguments so humans check small steps. #observation
     [Bowman et al. 2022](https://arxiv.org/abs/2211.03540)
     > "scalable oversight: the problem of supervising systems that potentially outperform us on most skills relevant to the task at hand"
-    {credence: 0.80, reason: "widely cited position paper from NYU alignment group"}
+    {reason: "widely cited position paper from NYU alignment group", credence: 0.80}
 ----
 (3) [Decomposition Works]: Breaking arguments into individually
     checkable steps enables human verification at scale.
-    {inference: 0.70, reason: "plausible mechanism, but empirical evidence thin"}
+    {reason: "plausible mechanism, but empirical evidence thin", inference: 0.70}
   +> [Closes Gap]
 
 <Structure Helps>
@@ -72,16 +88,16 @@ model:
     studies on argument mapping in higher education. #observation
     [Nesbit & Liu 2025](https://doi.org/10.1111/hequ.70063)
     > "the weight of evidence supports a recommendation that instructors use argument mapping to develop critical thinking and argumentation skills"
-    {credence: 0.70, reason: "systematic review of 124 studies, but effect sizes vary and meta-analysis still needed"}
+    {reason: "systematic review of 124 studies, but effect sizes vary and meta-analysis still needed", credence: 0.70}
 (2) [Hallucination Rate]: Safran & Cali 2025 find only 7.5% of
     LLM-generated references are fully accurate. #observation
     [Safran & Cali 2025](https://doi.org/10.38053/acmj.1746227)
     > "Only 7.5% of references were fully accurate in the initial generation, while 42.5% were completely fabricated"
-    {credence: 0.80, reason: "small study (40 refs) but consistent with other findings"}
+    {reason: "small study (40 refs) but consistent with other findings", credence: 0.80}
 ----
 (3) [Forced Sourcing Helps]: Requiring URL + exact quote per claim
     makes hallucinated citations immediately visible.
-    {inference: 0.85, reason: "if quote must be verbatim, fabrication is caught on click"}
+    {reason: "if quote must be verbatim, fabrication is caught on click", inference: 0.85}
   +> [Closes Gap]
 
 # Evidence Against
@@ -90,14 +106,14 @@ model:
 
 (1) [Verbosity]: Vargdown files are 3-5x longer than prose summaries,
     requiring more LLM tokens and human reading time. #assumption
-    {credence: 0.90, reason: "observed in our own tests: ~200 lines vs ~50 lines prose"}
+    {reason: "observed in our own tests: ~200 lines vs ~50 lines prose", credence: 0.90}
 (2) [Parser Friction]: Argdown strict mode rejects common patterns
     like unnamed conclusions and ><, increasing failure rate. #assumption
-    {credence: 0.70, reason: "seen in 3/4 initial agent tests"}
+    {reason: "seen in 3/4 initial agent tests", credence: 0.70}
 ----
 (3) [Too Costly]: The overhead of structured format may not be
     worth the verification benefit for simple questions.
-    {inference: 0.40, reason: "overhead is real but format is for complex contested claims, not simple queries"}
+    {reason: "overhead is real but format is for complex contested claims, not simple queries", inference: 0.40}
   -> [Closes Gap]
 ```
 
@@ -105,20 +121,9 @@ Output: `[Closes Gap]` implied credence ~66% (+0.67 log-odds; pro outweighs con 
 
 ---
 
-## Verification
+## Format Rules
 
-Run the verifier script after writing. Fix errors until it passes:
-
-```bash
-just verify <stem>          # text output: checks + computed credences
-just render <stem>          # also generates HTML with colored cards
-```
-
-The verifier checks: credence consistency, PCS math, graph structure, and contradiction constraints. It computes conclusion credences from premises and outputs a bottom-line assessment.
-
-**Agent workflow**: write .argdown -> run `just verify` -> read errors -> fix -> re-run until "All checks passed."
-
-## Tags
+### Tags
 
 | Tag            | Meaning                                      |
 | -------------- | -------------------------------------------- |
@@ -129,29 +134,37 @@ The verifier checks: credence consistency, PCS math, graph structure, and contra
 | `#mechanism`   | Explanation of how/why                       |
 | `#cluster-X`   | Correlated arguments (shared evidence)       |
 
-## Key Rules (deviations from standard Argdown)
+### Key Rules (deviations from standard Argdown)
 
-1. **`{credence: X}`** on premises = trust in source (0-1). **`{inference: X}`** on conclusions = reasoning strength given premises (0-1). Never write `{credence}` on a conclusion. Example: `{credence: 0.7}` on a premise, `{inference: 0.6}` on its conclusion. The conclusion's credence is _computed_: `product(premise credences) * inference`, aggregated via log-odds.
+1. **`{reason: "...", credence: X}`** on premises = trust in source (0-1). **`{reason: "...", inference: X}`** on conclusions = reasoning strength given premises (0-1). Never write `{credence}` on a conclusion -- credence is _computed_: `product(premise credences) * inference`, aggregated via log-odds. Reason always comes first.
 2. **Top-level claim** gets NO hardcoded credence. It's computed via log-odds aggregation.
-3. **`#observation`** premises MUST have: `[Label](url_or_evidence_file)` link + `> "exact quote"` blockquote. Save source text to `evidence/` so verification uses a frozen local copy, not a live URL.
-4. **`#assumption`** premises need `{credence: X, reason: "..."}` but no URL.
-5. **ALL conclusions** must be named: `(3) [Name]: text`. Never bare sentences.
-6. **`{reason: "..."}`** is required on every credence and inference value.
-7. **`><` does not parse.** Use mutual contraries instead (see Pattern 4 below).
+3. **Tag-specific requirements**:
+   - **`#observation`**: MUST have `[Label](url)` link + `> "exact quote"` blockquote + `{reason, credence}`. Save source text to `evidence/` so verification uses a frozen local copy. Link to the specific passage: `[Label](evidence/paper.md#L42)` for a line or `[Label](evidence/paper.md#L42-L55)` for a range. The renderer will inline the referenced text as a popup.
+   - **`#assumption`**: needs `{reason, credence}` but NO URL required.
+   - **`#mechanism`**, **`#prior`**, **`#crux`**: same as `#assumption` (reason + credence, no URL required). Tag is metadata only.
+4. **ALL conclusions** must be named: `(3) [Name]: text`. Never bare sentences.
+5. **`{reason: "..."}`** is required on every credence and inference value, and comes first.
+6. **`><` does not parse.** Use mutual contraries instead (see Pattern 4 below).
 
-## Procedure
+### Relation Constraints
 
-1. State the claim as a falsifiable thesis (no hardcoded credence)
-2. Search for evidence -- find papers, extract ONE direct quote per claim
-3. Write top-level structure: `[Thesis]` with `+ <Pro>` and `- <Con>` arguments
-4. Write each argument as a PCS (premise-conclusion structure) with numbered premises, inference bar, named conclusion
-5. Run `just verify <stem>` -- fix errors until "All checks passed", then `just render` for HTML
+| Relation | Constraint | Meaning |
+|---|---|---|
+| A `+>` B (entails) | P(B) >= P(A) | If A is true, B must be true |
+| A `->` B (contrary) | P(A) + P(B) <= 1 | A and B can't both be true |
+| A `><` B (contradictory) | P(A) + P(B) = 1 | Exactly one is true |
+
+### Verification
+
+The verifier checks: credence consistency, PCS math, graph structure, and contradiction constraints. It computes conclusion credences from premises and outputs a bottom-line assessment.
 
 ---
 
-## Pattern Snippets
+## Appendix
 
-### Undercut (Pattern 3)
+### Pattern Snippets
+
+#### Undercut (Pattern 3)
 
 Attacks the inference, not the premises. "Even if true, doesn't follow."
 
@@ -160,48 +173,48 @@ Attacks the inference, not the premises. "Even if true, doesn't follow."
 (1) [Collapse]: Shumailov 2024 showed recursive self-training degrades. #observation
     [Shumailov 2024](https://www.nature.com/articles/s41586-024-07566-y)
     > "Model collapse is a degenerative process"
-    {credence: 0.85, reason: "Nature paper, well-replicated"}
+    {reason: "Nature paper, well-replicated", credence: 0.85}
 ----
 (2) [Naive Degrades]: Naive synthetic scaling degrades quality.
-    {inference: 0.80, reason: "direct implication"}
+    {reason: "direct implication", inference: 0.80}
   _> <Synthetic Data Fix>
 ```
 
-### Contradiction / Value Tension (Pattern 4)
+#### Contradiction / Value Tension (Pattern 4)
 
 `><` doesn't parse. Use mutual `- [other]` + comment:
 
 ```argdown
 // Contradiction: P(Risk Real) + P(Opportunity Cost) = 1
 [Risk Real]: AI catastrophe probability >= 5%. #observation
-  {credence: 0.70, reason: "expert survey median ~5-10%"}
+  {reason: "expert survey median ~5-10%", credence: 0.70}
   - [Opportunity Cost]
 [Opportunity Cost]: Pausing delays millions of QALYs/year. #assumption
-  {credence: 0.30, reason: "complement of Risk Real"}
+  {reason: "complement of Risk Real", credence: 0.30}
   - [Risk Real]
 ```
 
-### Multi-Step Inference (Pattern 5)
+#### Multi-Step Inference (Pattern 5)
 
 Name every intermediate conclusion:
 
 ```argdown
 <Recursive Takeoff>
 (1) [No Ceiling]: No fundamental barrier at human level. #assumption
-    {credence: 0.85, reason: "no known theoretical ceiling"}
+    {reason: "no known theoretical ceiling", credence: 0.85}
 (2) [Self Improve]: Capable AI could improve its own training. #assumption
-    {credence: 0.50, reason: "speculative but plausible"}
+    {reason: "speculative but plausible", credence: 0.50}
 ----
 (3) [Rapid Gain]: Recursive self-improvement produces rapid capability gain.
-    {inference: 0.40, reason: "possible but not certain"}
+    {reason: "possible but not certain", inference: 0.40}
 (4) [Narrow Window]: Intervention window may be very short. #assumption
-    {credence: 0.35, reason: "depends on speed of recursive improvement"}
+    {reason: "depends on speed of recursive improvement", credence: 0.35}
 ----
 (5) [Pause Buys Time]: A pause gives safety margin before recursive takeoff.
-    {inference: 0.30, reason: "only helps if takeoff is near"}
+    {reason: "only helps if takeoff is near", inference: 0.30}
 ```
 
-### Sub-Question Decomposition (Pattern 6)
+#### Sub-Question Decomposition (Pattern 6)
 
 A crux with `- [Main Q]` means: if this crux is true, Main Q becomes less likely.
 
@@ -215,7 +228,7 @@ A crux with `- [Main Q]` means: if this crux is true, Main Q becomes less likely
 
 Then give each crux its own PCS arguments with evidence.
 
-### Bottom Line Synthesis (Pattern 7)
+#### Bottom Line Synthesis (Pattern 7)
 
 Use `+> [Thesis]` if evidence supports, `-> [Thesis]` if against:
 
@@ -228,70 +241,70 @@ Use `+> [Thesis]` if evidence supports, `-> [Thesis]` if against:
 Weighing pro and con arguments {uses: [1, 2, 3]}
 --
 (4) [Verdict]: Net assessment after weighing all evidence.
-    {inference: 0.55, reason: "pro outweighs con but margin is thin"}
+    {reason: "pro outweighs con but margin is thin", inference: 0.55}
   +> [Main Claim]
 ```
 
-### Conditional Decomposition (Pattern 8)
+#### Conditional Decomposition (Pattern 8)
 
 ```argdown
 // Contradiction: exactly one scenario
 [ITER Succeeds]: ITER achieves Q>10 by 2035. #assumption
-  {credence: 0.40, reason: "behind schedule but possible"}
+  {reason: "behind schedule but possible", credence: 0.40}
   - [ITER Fails]
 [ITER Fails]: ITER does not achieve Q>10. #assumption
-  {credence: 0.60, reason: "history of delays"}
+  {reason: "history of delays", credence: 0.60}
   - [ITER Succeeds]
 
 <Fusion If ITER Succeeds>
 (1) [ITER Succeeds]
 (2) [Fast Commercialization]: Private sector scales quickly after proof. #assumption
-    {credence: 0.50, reason: "assumes regulatory cooperation"}
+    {reason: "assumes regulatory cooperation", credence: 0.50}
 ----
 (3) [Commercial Fusion Possible]: Commercial fusion reactors by 2045.
-    {inference: 0.45, reason: "10 years is aggressive for deployment"}
+    {reason: "10 years is aggressive for deployment", inference: 0.45}
   +> [Fusion By 2045]
 ```
 
-### Correlated Arguments (Pattern 9)
+#### Correlated Arguments (Pattern 9)
 
 Tag with `#cluster-X` to flag shared evidence base:
 
 ```argdown
 <Economic Cost> #cluster-cost
-(1) [GDP Hit]: Sanctions could cost 7% of GDP. #observation {credence: 0.70, reason: "IMF estimates"}
+(1) [GDP Hit]: Sanctions could cost 7% of GDP. #observation
+    {reason: "IMF estimates", credence: 0.70}
 ----
-(2) [Econ Deters]: Economic costs deter. {inference: 0.65, reason: "assumes rational actors"}
+(2) [Econ Deters]: Economic costs deter.
+    {reason: "assumes rational actors", inference: 0.65}
   +> [Safe Outcome]
 
 <Reputational Cost> #cluster-cost
-(1) [Brand Risk]: Brand damage from unsafe deployment. #assumption {credence: 0.60, reason: "some evidence"}
+(1) [Brand Risk]: Brand damage from unsafe deployment. #assumption
+    {reason: "some evidence", credence: 0.60}
 ----
-(2) [Rep Deters]: Reputation costs deter. {inference: 0.55, reason: "weaker than economic"}
+(2) [Rep Deters]: Reputation costs deter.
+    {reason: "weaker than economic", inference: 0.55}
   +> [Safe Outcome]
 ```
 
-### Base Rate Prior (Pattern 10)
+#### Base Rate Prior (Pattern 10)
 
 ```argdown
 [Base Rate]: Historical energy transitions take 50-70 years. #prior #observation
-  {credence: 0.80, role: "prior", base_rate: 0.04, reason: "Smil 2010 data"}
+  {reason: "Smil 2010 data", credence: 0.80, role: "prior", base_rate: 0.04}
   +> [Slow Transition]
 
 <Upward Update>
 (1) [New Signal]: Private fusion investment 10x in 5 years. #observation
-    {credence: 0.75, reason: "documented but novel"}
+    {reason: "documented but novel", credence: 0.75}
 ----
 (2) [Faster Than Base]: Update toward faster transition.
-    {inference: 0.60, role: "update", direction: "up", magnitude: 1.5, reason: "investment != deployment"}
+    {reason: "investment != deployment", inference: 0.60, role: "update", direction: "up", magnitude: 1.5}
   +> [Fast Transition]
 ```
 
----
-
----
-
-## Ensemble Mode
+### Ensemble Mode
 
 To compare two agents' argument maps on the same topic:
 
@@ -312,12 +325,11 @@ To compare two agents' argument maps on the same topic:
 
 3. The arbiter merges into `topic_merged.argdown`, keeping the stronger-sourced version of each disputed claim, and noting disagreements as comments.
 
----
-
-## Common Mistakes
+### Common Mistakes
 
 | Mistake                              | Fix                                                                       |
 | ------------------------------------ | ------------------------------------------------------------------------- |
+| `{credence: X, reason: "..."}` order | `{reason: "...", credence: X}` -- reason first, then number              |
 | `{credence: X}` on a conclusion      | `{inference: X}` -- credence is computed                                  |
 | `{credence: X}` on top-level claim   | Remove -- computed via log-odds                                           |
 | Unnamed conclusion `(3) Some text.`  | `(3) [Name]: Some text.`                                                  |
@@ -325,6 +337,6 @@ To compare two agents' argument maps on the same topic:
 | Blockquote is vague or a paper title | Find a specific declarative finding                                       |
 | Paraphrasing in blockquote           | Use exact text; if paraphrasing: `> "paraphrase: ..."` and lower credence |
 | Multi-sentence inference             | Split into sub-arguments (Pattern 5)                                      |
-| Missing `{reason: "..."}`            | Always explain why this number                                            |
-| `[brackets]` in blockquotes          | Escape as `\[text\]` -- parser treats `[x]` as statement refs             |
+| Missing `{reason: "..."}`            | Always explain why this number, before the number                         |
+| `[...]` in blockquotes               | Use `(...)` instead -- parser treats `[x]` as statement refs              |
 | Using `><` for contradiction         | Use mutual `- [other]` contraries (see Pattern 4)                         |
