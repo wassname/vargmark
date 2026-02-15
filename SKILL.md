@@ -11,7 +11,50 @@ description: |
 
 Every claim has a clickable source + quote. Premises get credences. Conclusions get inference strengths. The top-level claim is computed, not asserted.
 
-## Complete Example
+
+**Agent workflow**: write .argdown -> run `just verify` -> read errors -> fix -> re-run until "All checks passed."
+
+## Procedure
+
+1. State the claim as a falsifiable thesis (no hardcoded credence)
+2. Search for evidence -- find papers, extract ONE direct quote per claim
+3. Write top-level structure: `[Thesis]` with `+ <Pro>` and `- <Con>` arguments
+4. Write each argument as a PCS (premise-conclusion structure) with numbered premises, inference bar, named conclusion
+5. Run `just verify <stem>` -- fix errors until "All checks passed", then `just render` for HTML
+
+
+## Principles
+
+TODO rewrite this as reason: implementation or similar sould be
+1. automatically verify what we can
+2. make it easy for a judge to verify
+  3. this means the judge has the same information as the writer
+  4. this means it requries little attention, time, or decoding to check
+
+### How
+
+1. **Every claim has a source you can click.** Observations link to a paper/URL and include a blockquote of raw text from the source. The premise text provides minimal context; the quote carries the factual weight. If a reader can't verify a premise in 10 seconds, the argument is not trustworthy.
+
+TODO and every source has a saved markdown, and a link to the section/line in that file
+TODO try this, update docs for this
+
+3. **Separate observation from inference from conclusion.** Premises are either sourced facts (`#observation`) or flagged assumptions (`#assumption`). The inference between `--` lines is one sentence. This makes the human's job small: check each one-liner inference step.
+
+4. **Commit to numbers, not vibes.** Premises get `{reason: '...', credence: X}` (how much you trust the source). Conclusions get `{reason: '...', inference: X}` (how strong the reasoning step is). The verifier computes conclusion credence = product(premise credences) * inference strength. Nothing derivable is hardcoded.
+
+5. **The argument computes a bottom line.** Entailments and contraries propagate through the graph to produce an implied credence for the top-level claim. The reader gets a single number, not just a tree.
+
+The relations have checkable probability constraints:
+
+| Relation | Constraint | Meaning |
+|---|---|---|
+| A `+>` B (entails) | P(B) >= P(A) | If A is true, B must be true |
+| A `->` B (contrary) | P(A) + P(B) <= 1 | A and B can't both be true |
+| A `><` B (contradictory) | P(A) + P(B) = 1 | Exactly one is true |
+
+
+
+## Complete Example of Output
 
 This skill document is itself a vargdown argument. Study the format, then read the rules.
 
@@ -30,6 +73,9 @@ model:
   - <Overhead Cost>
 
 # Evidence For
+
+
+# TODO FIXME always have reason before credece as we are thinking not rationalising post hoc
 
 <Debate Helps>
 
@@ -92,14 +138,14 @@ Output: `[Closes Gap]` implied credence ~66% (+0.67 log-odds; pro outweighs con 
 
 Run the verifier script after writing. Fix errors until it passes:
 
+TODO remove just dependancy (use uv or npx)
+
 ```bash
 just verify <stem>          # text output: checks + computed credences
 just render <stem>          # also generates HTML with colored cards
 ```
 
 The verifier checks: credence consistency, PCS math, graph structure, and contradiction constraints. It computes conclusion credences from premises and outputs a bottom-line assessment.
-
-**Agent workflow**: write .argdown -> run `just verify` -> read errors -> fix -> re-run until "All checks passed."
 
 ## Tags
 
@@ -123,14 +169,6 @@ The verifier checks: credence consistency, PCS math, graph structure, and contra
 5. **ALL conclusions** must be named: `(3) [Name]: text`. Never bare sentences.
 6. **`{reason: "..."}`** is required on every credence and inference value.
 7. **`><` does not parse.** Use mutual contraries instead (see Pattern 4 below).
-
-## Procedure
-
-1. State the claim as a falsifiable thesis (no hardcoded credence)
-2. Search for evidence -- find papers, extract ONE direct quote per claim
-3. Write top-level structure: `[Thesis]` with `+ <Pro>` and `- <Con>` arguments
-4. Write each argument as a PCS (premise-conclusion structure) with numbered premises, inference bar, named conclusion
-5. Run `just verify <stem>` -- fix errors until "All checks passed", then `just render` for HTML
 
 ---
 
