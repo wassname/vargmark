@@ -8,6 +8,32 @@ Goal: make it hard to the LLM to hallucinate, and easy for you to check.
 - 2nd pass: approximate verification by another agent (sub agent)
 - 3rd pass: human, assisted by good UI
 
+## Example
+
+```argdown
+===
+model:
+    mode: strict
+===
+
+<B>
+
+(1) [P2]: premise2 #assumption
+    {reason: "r", credence: 0.5}
+----
+(2) [C2]: conclusion2
+    {reason: "r", inference: 0.6}
+
+<A>
+
+(1) [P1]: premise1 #assumption
+    {reason: "r", credence: 0.8}
+----
+(2) [C1]: conclusion1
+    {reason: "r", inference: 0.7}
+  _> <B>
+```
+
 ## Principles
 
 **Machine-check what you can; make the rest judgeable at the right level.**

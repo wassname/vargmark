@@ -267,54 +267,71 @@ function checkPcsCredences(data, statements) {
   const argumentsData = data.arguments || {};
   for (const [argName, arg] of Object.entries(argumentsData)) {
     const pcs = (arg && arg.pcs) || [];
-    const premises = pcs.filter((m) => m.role === "premise");
-    const conclusions = pcs.filter((m) => m.role === "main-conclusion");
-    if (premises.length === 0 || conclusions.length === 0) {
-      continue;
-    }
+    if (pcs.length === 0) continue;
 
-    const premiseCredences = premises
-      .map((p) => [p.title, (p.data || {}).credence])
-      .filter(([, c]) => c != null);
-    if (premiseCredences.length === 0) {
-      continue;
-    }
+    // Walk PCS in order: premises accumulate, conclusions consume them (staged)
+    let stagePremises = []; // [[title, credence], ...]
+    for (const m of pcs) {
+      const d = m.data || {};
 
-    const premiseProduct = premiseCredences.reduce((acc, [, c]) => acc * c, 1.0);
-
-    for (const conc of conclusions) {
-      const concData = conc.data || {};
-      const inference = concData.inference;
-      const hardcoded = concData.credence;
-
-      if (inference != null) {
-        const computed = premiseProduct * inference;
-        const premiseStr = premiseCredences.map(([, c]) => `${c}`).join(" * ");
-        notes.push(`  <${argName}>: [${conc.title}]`);
-        notes.push(`    premises: ${premiseStr} = ${premiseProduct.toFixed(3)}`);
-        notes.push(`    inference: ${inference}`);
-        notes.push(
-          `    computed credence: ${premiseProduct.toFixed(3)} * ${inference} = ${computed.toFixed(2)}`
-        );
-        if (statements[conc.title]) {
-          statements[conc.title].credence = Math.round(computed * 10000) / 10000;
+      if (m.role === "premise") {
+        if (d.credence != null) {
+          stagePremises.push([m.title, d.credence]);
         }
-        if (inference > 1.0) {
-          errors.push(`PCS: <${argName}> [${conc.title}] inference=${inference} > 1.0`);
+        // Error: conclusion uses {credence} (issue #3)
+        if (d.inference != null) {
+          errors.push(`PCS: <${argName}> premise [${m.title}] has {inference} -- only conclusions get inference`);
         }
-      } else if (hardcoded != null) {
-        if (hardcoded > premiseProduct) {
+        continue;
+      }
+
+      if (m.role === "intermediary-conclusion" || m.role === "main-conclusion") {
+        const inference = d.inference;
+        const hardcoded = d.credence;
+
+        // Error: conclusion uses {credence} instead of {inference} (issue #3)
+        if (hardcoded != null && inference == null) {
           errors.push(
-            `PCS: <${argName}> [${conc.title}] credence=${hardcoded} > product of premises (${premiseProduct.toFixed(
-              3
-            )})`
+            `PCS: <${argName}> [${m.title}] has {credence} on conclusion -- use {inference} instead (credence is computed)`
           );
         }
-        const implied = hardcoded / premiseProduct;
-        const premiseStr = premiseCredences.map(([, c]) => `${c}`).join(" * ");
-        notes.push(`  <${argName}>: [${conc.title}] credence=${hardcoded}`);
-        notes.push(`    premises: ${premiseStr} = ${premiseProduct.toFixed(3)}`);
-        notes.push(`    implied inference: ${hardcoded} / ${premiseProduct.toFixed(3)} = ${implied.toFixed(2)}`);
+
+        if (stagePremises.length === 0) continue;
+        const premiseProduct = stagePremises.reduce((acc, [, c]) => acc * c, 1.0);
+
+        if (inference != null) {
+          if (inference > 1.0 || inference < 0) {
+            errors.push(`PCS: <${argName}> [${m.title}] inference=${inference} out of range [0,1]`);
+          }
+          const computed = premiseProduct * inference;
+          const premiseStr = stagePremises.map(([, c]) => `${c}`).join(" * ");
+          notes.push(`  <${argName}>: [${m.title}]`);
+          notes.push(`    premises: ${premiseStr} = ${premiseProduct.toFixed(3)}`);
+          notes.push(`    inference: ${inference}`);
+          notes.push(
+            `    computed credence: ${premiseProduct.toFixed(3)} * ${inference} = ${computed.toFixed(2)}`
+          );
+          const rounded = Math.round(computed * 10000) / 10000;
+          if (statements[m.title]) {
+            statements[m.title].credence = rounded;
+          }
+
+          // For multi-step: intermediary feeds into next stage as a premise
+          if (m.role === "intermediary-conclusion") {
+            stagePremises = [[m.title, rounded]];
+          }
+        } else if (hardcoded != null) {
+          if (hardcoded > premiseProduct) {
+            errors.push(
+              `PCS: <${argName}> [${m.title}] credence=${hardcoded} > product of premises (${premiseProduct.toFixed(3)})`
+            );
+          }
+          const implied = hardcoded / premiseProduct;
+          const premiseStr = stagePremises.map(([, c]) => `${c}`).join(" * ");
+          notes.push(`  <${argName}>: [${m.title}] credence=${hardcoded}`);
+          notes.push(`    premises: ${premiseStr} = ${premiseProduct.toFixed(3)}`);
+          notes.push(`    implied inference: ${hardcoded} / ${premiseProduct.toFixed(3)} = ${implied.toFixed(2)}`);
+        }
       }
     }
   }
@@ -365,9 +382,28 @@ function clampCredence(c) {
   return Math.max(0.001, Math.min(0.999, c));
 }
 
-function propagateCredences(statements, relations) {
-  const targets = {};
+function propagateCredences(statements, relations, data) {
+  // Resolve undercut: _> targets an argument, treat as contrary on argument's main conclusion
+  const argumentsData = data?.arguments || {};
+  const resolvedRelations = [];
   for (const rel of relations) {
+    if (rel.relationType === "undercut") {
+      // Undercut targets argument name; find its main conclusion
+      const arg = argumentsData[rel.to];
+      if (arg) {
+        const mainConc = (arg.pcs || []).find((m) => m.role === "main-conclusion");
+        if (mainConc) {
+          resolvedRelations.push({ ...rel, relationType: "contrary", to: mainConc.title });
+          continue;
+        }
+      }
+      // If can't resolve, still add as-is (will be ignored but won't crash)
+    }
+    resolvedRelations.push(rel);
+  }
+
+  const targets = {};
+  for (const rel of resolvedRelations) {
     const fromC = statements[rel.from]?.credence;
     if (fromC == null) {
       continue;
@@ -419,6 +455,86 @@ function formatPropagation(targets) {
   return lines;
 }
 
+// Issue #4: thesis statement (target of entails from PCS conclusions) must not have hardcoded credence
+function checkTopLevelCredence(data) {
+  const errors = [];
+  // Find statements that are targets of entails relations (thesis statements)
+  const entailTargets = new Set();
+  const st = data.statements || {};
+  for (const [, ec] of Object.entries(st)) {
+    for (const rel of (ec && ec.relations) || []) {
+      if (rel.relationType === "entails") {
+        entailTargets.add(rel.to);
+      }
+    }
+  }
+  const argumentsData = data.arguments || {};
+  for (const [, arg] of Object.entries(argumentsData)) {
+    for (const rel of (arg && arg.relations) || []) {
+      if (rel.relationType === "entails") {
+        entailTargets.add(rel.to);
+      }
+    }
+  }
+  // Only flag entails targets that also have hardcoded credence
+  for (const title of entailTargets) {
+    const ec = st[title];
+    const d = (ec && ec.data) || {};
+    if (d.credence != null) {
+      errors.push(`TOP-LEVEL: [${title}] has {credence: ${d.credence}} -- thesis credence should be computed, not stated`);
+    }
+  }
+  return errors;
+}
+
+// Issue #5: {reason} is required on every credence/inference
+function checkRequiredFields(data) {
+  const errors = [];
+  function checkData(d, label) {
+    if (!d) return;
+    if ((d.credence != null || d.inference != null) && !d.reason) {
+      const field = d.credence != null ? "credence" : "inference";
+      errors.push(`MISSING REASON: ${label} has {${field}} but no {reason}`);
+    }
+  }
+  const statements = data.statements || {};
+  for (const [title, ec] of Object.entries(statements)) {
+    checkData((ec && ec.data) || {}, `[${title}]`);
+  }
+  const argumentsData = data.arguments || {};
+  for (const [argName, arg] of Object.entries(argumentsData)) {
+    for (const m of (arg && arg.pcs) || []) {
+      checkData(m.data || {}, `[${m.title || argName}] in <${argName}>`);
+    }
+  }
+  return errors;
+}
+
+// Issue #6: credence and inference must be in [0, 1]
+function checkRanges(data) {
+  const errors = [];
+  function checkData(d, label) {
+    if (!d) return;
+    if (d.credence != null && (d.credence < 0 || d.credence > 1)) {
+      errors.push(`RANGE: ${label} credence=${d.credence} out of [0, 1]`);
+    }
+    if (d.inference != null && (d.inference < 0 || d.inference > 1)) {
+      errors.push(`RANGE: ${label} inference=${d.inference} out of [0, 1]`);
+    }
+  }
+  const statements = data.statements || {};
+  for (const [title, ec] of Object.entries(statements)) {
+    checkData((ec && ec.data) || {}, `[${title}]`);
+  }
+  const argumentsData = data.arguments || {};
+  for (const [argName, arg] of Object.entries(argumentsData)) {
+    for (const m of (arg && arg.pcs) || []) {
+      checkData(m.data || {}, `[${m.title || argName}] in <${argName}>`);
+    }
+  }
+  return errors;
+}
+
 // --- Verification runner ---
 
 function verify(data) {
@@ -426,13 +542,18 @@ function verify(data) {
   const relations = extractRelations(data);
 
   const allErrors = [];
-  allErrors.push(...checkCredenceConsistency(statements, relations));
   allErrors.push(...checkMath(statements));
   allErrors.push(...checkGraph(statements, relations, data));
   allErrors.push(...checkFieldOrdering(data));
+  allErrors.push(...checkRequiredFields(data));
+  allErrors.push(...checkRanges(data));
 
+  // Compute conclusion credences first, then check consistency (issue #10)
   const [pcsErrors, pcsNotes] = checkPcsCredences(data, statements);
   allErrors.push(...pcsErrors);
+  allErrors.push(...checkCredenceConsistency(statements, relations));
+  allErrors.push(...checkTopLevelCredence(data));
+
   const cruxNotes = cruxAnalysis(statements, relations);
 
   if (allErrors.length > 0) {
@@ -458,7 +579,7 @@ function verify(data) {
     }
   }
 
-  const targets = propagateCredences(statements, relations);
+  const targets = propagateCredences(statements, relations, data);
   const propLines = formatPropagation(targets);
   if (propLines.length > 0) {
     console.log("\nBottom line:");
@@ -856,7 +977,7 @@ function renderHtml(data, statements, relations, argdownSource = null, baseDir =
     }
   }
 
-  const targets = propagateCredences(statements, relations);
+  const targets = propagateCredences(statements, relations, data);
   const bottomLines = Object.entries(targets)
     .filter(([, t]) => t.implied != null)
     .map(([t, info]) => [t, info.implied, info]);
