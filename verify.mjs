@@ -314,6 +314,11 @@ function checkPcsCredences(data, statements) {
           const rounded = Math.round(computed * 10000) / 10000;
           if (statements[m.title]) {
             statements[m.title].credence = rounded;
+            // Store PCS breakdown for bottom-line rendering
+            statements[m.title].pcsBreakdown = {
+              premises: stagePremises.map(([name, c]) => [name, c]),
+              inference,
+            };
           }
 
           // For multi-step: intermediary feeds into next stage as a premise
@@ -764,6 +769,22 @@ function observationKey(url, snippet) {
   return `${url}::${snippetTokens(snippet).join("-")}`;
 }
 
+/**
+ * Build a text fragment directive (#:~:text=...) for browser quote highlighting.
+ * Uses bold fragments if available, otherwise first/last words of quote.
+ * See https://web.dev/text-fragments/
+ */
+function textFragmentFromQuote(quote, boldFragments) {
+  const target = (boldFragments && boldFragments.length > 0)
+    ? boldFragments[0]
+    : quote;
+  const words = target.split(/\s+/).filter(Boolean);
+  if (words.length < 3) return null;
+  const prefix = words.slice(0, 3).join(" ");
+  const suffix = words.slice(-3).join(" ");
+  return `#:~:text=${encodeURIComponent(prefix)},${encodeURIComponent(suffix)}`;
+}
+
 function parseEvidenceMarkdown(text) {
   const lines = String(text).split("\n");
   let source = null;
@@ -928,7 +949,13 @@ function renderArgument(argName, arg, statements, relations, baseDir = null) {
     const sourceParts = [];
     if (linkUrl) {
       const display = linkName ? escapeHtml(linkName) : escapeHtml(linkUrl);
-      sourceParts.push(`<a href="${escapeHtml(linkUrl)}" target="_blank">${display}</a>`);
+      // Build text fragment URL for quote highlighting in browser
+      let href = escapeHtml(linkUrl);
+      if (quote && linkUrl.startsWith("http")) {
+        const frag = textFragmentFromQuote(quote, boldFragments);
+        if (frag) href += frag;
+      }
+      sourceParts.push(`<a href="${href}" target="_blank">${display}</a>`);
     }
     if (credence != null) {
       sourceParts.push(renderCredence(credence, "credence", reason));
@@ -984,9 +1011,10 @@ function renderArgument(argName, arg, statements, relations, baseDir = null) {
     }
 
     if (relLabel && relTarget) {
-      const symbol = { entails: "&uarr;", contrary: "&darr;", contradictory: "&harr;" }[argType] || "?";
+      const symbol = { entails: "+", contrary: "-", contradictory: "&harr;" }[argType] || "?";
+      const cssClass = { entails: "support", contrary: "attack", undercut: "undercut" }[argType] || "";
       lines.push(
-        `<span class="relation-indicator" style="color:${borderColor};" title="${relLabel}"> ` +
+        `<span class="relation-indicator ${cssClass}" title="${relLabel}">` +
           `${symbol} ${relLabel} ${escapeHtml(relTarget)}</span>`
       );
     }
@@ -1060,7 +1088,10 @@ blockquote {
 }
 .conclusion { padding: 0.5em; background: #f8f9fa; border-radius: 4px; }
 .math { font-size: 0.9em; color: #555; font-variant-numeric: tabular-nums; }
-.relation-indicator { font-size: 0.85em; font-weight: 600; margin-left: 0.5em; }
+.relation-indicator { font-size: 0.85em; font-weight: 600; margin-left: 0.5em; display: inline-block; margin-top: 0.5em; }
+.relation-indicator.support { color: #04c93f; background: #cee7d6; padding: 0.2em 0.6em; border-radius: 1em; }
+.relation-indicator.attack { color: #c93504; background: #fde0d6; padding: 0.2em 0.6em; border-radius: 1em; }
+.relation-indicator.undercut { color: #ff00d4; background: #ffb9f3; padding: 0.2em 0.6em; border-radius: 1em; }
 a { color: #0582ca; }
 .credence { font-size: 0.85em; font-variant-numeric: tabular-nums; }
 .section-label { color: #888; font-size: 0.9em; text-transform: uppercase; letter-spacing: 0.05em; }

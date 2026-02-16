@@ -7,12 +7,15 @@ model:
 
 [Linear Probes Strong Default]: Linear probes should be the default baseline
   for concept detection in LLM representations.
-  + <Utility Evidence>
-  - <Limits Evidence>
+  + <Prominence Evidence>
+  + <Formal Grounding>
+  + <Benchmark Evidence>
+  - <Methodology Limits>
+  - <Steering Limits>
 
 # Evidence For
 
-<Utility Evidence>
+<Prominence Evidence>
 
 (1) [Prominent Method]: Probing classifiers are already a prominent method
     for analyzing NLP model representations. #observation
@@ -20,27 +23,43 @@ model:
     [evidence](evidence/acl_2022_cl_1_7_probing_classifiers.md#L53-L53)
     > "Probing classifiers have emerged as one of the prominent methodologies for interpreting and analyzing deep neural network models of natural language processing. The basic idea is simple-a classifier is trained to predict some linguistic property from a model's representations-and has been used to examine a **wide variety of models and properties**. However, recent studies have demonstrated various methodological limitations of this approach. This squib critically reviews the probing classifiers framework, highlighting their promises, shortcomings, and advances."
     {reason: "peer-reviewed survey in Computational Linguistics", credence: 0.82}
-(2) [Formal Connection]: Linear probing is formally connected to model
+----
+(2) [Prominence Supports]: Widespread adoption in NLP signals
+    practical utility as a baseline.
+    {reason: "prominence alone doesn't imply correctness, but suggests practical value", inference: 0.65}
+  +> [Linear Probes Strong Default]
+
+<Formal Grounding>
+
+(1) [Formal Connection]: Linear probing is formally connected to model
     steering in a counterfactual framework. #observation
     [Park et al. 2024](https://arxiv.org/abs/2311.03658)
     [evidence](evidence/arxiv_2311_03658_linear_representation_hypothesis.md#L59-L59)
     > "In this paper, we address two closely related questions: What does linear representation actually mean? And, how do we make sense of geometric notions (e.g., cosine similarity or projection) in the representation space? To answer these, we use the language of counterfactuals to give two formalizations of linear representation, one in the output (word) representation space, and one in the input (sentence) space. We then prove these connect to **linear probing and model steering**, respectively. To make sense of geometric notions, we use the formalization to identify a particular (non-Euclidean) inner product that respects language structure in a sense we make precise."
     {reason: "the claim is explicit in the abstract and tied to formalization", credence: 0.74}
-(3) [Competitive Signal]: In AxBench, simpler alternatives to SAEs remain
+----
+(2) [Theory Supports]: Formal grounding connects probes to causal
+    mechanisms, not just correlation.
+    {reason: "formal connection is necessary but not sufficient for practical utility", inference: 0.70}
+  +> [Linear Probes Strong Default]
+
+<Benchmark Evidence>
+
+(1) [Competitive Signal]: In AxBench, simpler alternatives to SAEs remain
     strong on concept detection tasks. #observation
     [Wu et al. 2025](https://arxiv.org/abs/2501.17148)
     [evidence](evidence/arxiv_2501_17148_axbench.md#L58-L58)
     > "At present, there is no benchmark for making direct comparisons between these proposals. Therefore, we introduce AxBench, a large-scale benchmark for steering and concept detection, and report experiments on Gemma-2-2B and 9B. For concept detection, representation-based methods such as **difference-in-means, perform the best**. On both evaluations, SAEs are not competitive."
     {reason: "benchmark paper with direct concept-detection evaluation", credence: 0.72}
 ----
-(4) [Good Baseline]: Linear probes are a good default baseline for
-    representation-level concept detection.
-    {reason: "prominence plus formal grounding plus benchmark competitiveness", inference: 0.76}
+(2) [Benchmark Supports]: Competitive performance on a dedicated
+    benchmark validates practical baseline status.
+    {reason: "single benchmark, but covers multiple models", inference: 0.70}
   +> [Linear Probes Strong Default]
 
 # Evidence Against
 
-<Limits Evidence>
+<Methodology Limits>
 
 (1) [Methodological Limits]: Probing has known methodological
     shortcomings that limit direct interpretability claims. #observation
@@ -48,15 +67,22 @@ model:
     [evidence](evidence/acl_2022_cl_1_7_probing_classifiers.md#L53-L53)
     > "The basic idea is simple-a classifier is trained to predict some linguistic property from a model's representations-and has been used to examine a wide variety of models and properties. However, recent studies have demonstrated **various methodological limitations** of this approach. This squib critically reviews the probing classifiers framework, highlighting their promises, shortcomings, and advances."
     {reason: "same survey explicitly warns against overinterpretation", credence: 0.83}
-(2) [Not Best for Steering]: For steering, prompting beats
+----
+(2) [Methods Limit Scope]: Methodological limits mean probes should
+    not be treated as causal evidence.
+    {reason: "limitation is about overinterpretation, not baseline utility", inference: 0.60}
+  -> [Linear Probes Strong Default]
+
+<Steering Limits>
+
+(1) [Not Best for Steering]: For steering, prompting beats
     representation methods in AxBench. #observation
     [Wu et al. 2025](https://arxiv.org/abs/2501.17148)
     [evidence](evidence/arxiv_2501_17148_axbench.md#L58-L58)
     > "Therefore, we introduce AxBench, a large-scale benchmark for steering and concept detection, and report experiments on Gemma-2-2B and 9B. For steering, we find that **prompting outperforms all existing methods**, followed by finetuning. For concept detection, representation-based methods such as difference-in-means, perform the best. On both evaluations, SAEs are not competitive."
     {reason: "direct benchmark comparison on steering utility", credence: 0.75}
 ----
-(3) [Scope-Limited Baseline]: Linear probes should not be treated as a
-    sufficient test of causal mechanism or as the best method for every
-    control objective.
-    {reason: "probing evidence is informative but not a complete causal criterion", inference: 0.80}
+(2) [Steering Weakness]: Linear probes should not be the default
+    for steering tasks.
+    {reason: "steering is a different task from detection, limits scope claim", inference: 0.65}
   -> [Linear Probes Strong Default]

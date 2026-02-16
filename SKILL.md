@@ -41,7 +41,7 @@ Every observation exports URL + exact quote + frozen local copy. The judge never
 Observations are checked against their source quote. Inferences are checked against reasoning and stated credence. Each step is one or the other, never mixed.
 
 **1c. Reason first, credence second; bottom line is computed, never stated.**
-State why before how-much -- reasoning to a number, not post-hoc rationalization. Write `{reason: "...", credence: X}` not `{credence: X, reason: "..."}`. Conclusion credence = product(premise credences) * inference. The top-level claim falls out of the math.
+State why before how-much -- reasoning to a number, not post-hoc rationalization. Write `{reason: "...", credence: X}` not `{credence: X, reason: "..."}`. Within a PCS, conclusion credence = product(premise credences) * inference -- premises are **joint conditions** (all must hold). For independent evidence, use separate arguments; log-odds combines them across arguments. The top-level claim falls out of the math.
 
 ## Example
 
@@ -57,12 +57,14 @@ model:
 
 [Closes Gap]: Structured argument maps with sourced quotes and
   computed credences close the verification gap in LLM-generated reasoning.
-  + <Structure Helps>
-  - <Overhead Cost>
+  + <Arg Mapping Research>
+  + <Hallucination Problem>
+  - <Verbosity Cost>
+  - <Parser Cost>
 
 # Evidence For
 
-<Structure Helps>
+<Arg Mapping Research>
 
 (1) [Arg Mapping]: Nesbit & Liu 2025 systematically reviewed 124
     studies on argument mapping in higher education. #observation
@@ -70,36 +72,52 @@ model:
     [evidence](evidence/nesbit_2025_argument_mapping.md#L9-L22)
     > This systematic review examines research on the use of argument maps or diagrams by postsecondary students. The goals were to identify the themes, research questions, and results of systematically identified studies, and to assess the current prospects for meta-analyses. Relevant databases were searched for qualitative, observational and experimental studies. We coded 124 studies on research design, mapping software, student attitudes, collaborative mapping and thinking skills. There were 102 empirical studies, of which 44% assessed student attitudes toward argument mapping, 40% investigated collaborative argument mapping and 51% examined the quality or structure of student-constructed argument maps. **The causal relationship most frequently investigated was the effect of argument mapping on critical thinking skills.** We present the results from selected studies and consider their significance for learning design.
     {reason: "systematic review of 124 studies, but effect sizes vary and meta-analysis still needed", credence: 0.70}
-(2) [Hallucination Rate]: Safran & Cali 2025 find only 7.5% of
+----
+(2) [Mapping Helps Thinking]: Argument mapping improves critical
+    thinking, so structured maps aid verification.
+    {reason: "review shows mapping helps, but verification gap is a narrower claim", inference: 0.75}
+  +> [Closes Gap]
+
+<Hallucination Problem>
+
+(1) [Hallucination Rate]: Safran & Cali 2025 find only 7.5% of
     LLM-generated references are fully accurate. #observation
     [Safran & Cali 2025](https://doi.org/10.38053/acmj.1746227)
     [evidence](evidence/safran_2025_hallucination.md#L134-L136)
     > **Only 7.5% of references were fully accurate in the initial generation, while 42.5% were completely fabricated.** The remaining 50% were partially correct. After verification, the proportion of fully accurate references rose to 77.5%. Wilcoxon signed-rank testing confirmed a statistically significant improvement in accuracy across all prompts (W=561.0, p<0.001, r=0.60). The most common errors included invalid DOIs, fabricated article titles, and mismatched metadata.
     {reason: "small study (40 refs) but consistent with other findings", credence: 0.80}
 ----
-(3) [Forced Sourcing Helps]: Requiring URL + exact quote per claim
+(2) [Forced Sourcing Helps]: Requiring URL + exact quote per claim
     makes hallucinated citations immediately visible.
     {reason: "if quote must be verbatim, fabrication is caught on click", inference: 0.85}
   +> [Closes Gap]
 
 # Evidence Against
 
-<Overhead Cost>
+<Verbosity Cost>
 
 (1) [Verbosity]: Vargdown files are 3-5x longer than prose summaries,
     requiring more LLM tokens and human reading time. #assumption
     {reason: "observed in our own tests: ~200 lines vs ~50 lines prose", credence: 0.90}
-(2) [Parser Friction]: Argdown strict mode rejects common patterns
+----
+(2) [Verbose But Worth It]: Verbosity overhead may not be worth it
+    for simple questions.
+    {reason: "real cost, but format is for complex contested claims", inference: 0.35}
+  -> [Closes Gap]
+
+<Parser Cost>
+
+(1) [Parser Friction]: Argdown strict mode rejects common patterns
     like unnamed conclusions and ><, increasing failure rate. #assumption
     {reason: "seen in 3/4 initial agent tests", credence: 0.70}
 ----
-(3) [Too Costly]: The overhead of structured format may not be
-    worth the verification benefit for simple questions.
-    {reason: "overhead is real but format is for complex contested claims, not simple queries", inference: 0.40}
+(2) [Friction Limits Adoption]: Parser strictness creates a barrier
+    to adoption.
+    {reason: "friction is real but decreasing as agents learn the format", inference: 0.40}
   -> [Closes Gap]
 ```
 
-Output: `[Closes Gap]` implied credence ~73% (+0.99 log-odds; pro outweighs con for complex claims).
+Output: `[Closes Gap]` implied credence ~93% (+2.6 log-odds; pro outweighs con for complex claims).
 
 ---
 
@@ -118,7 +136,7 @@ Output: `[Closes Gap]` implied credence ~73% (+0.99 log-odds; pro outweighs con 
 
 ### Key Rules (deviations from standard Argdown)
 
-1. **`{reason: "...", credence: X}`** on premises = trust in source (0-1). **`{reason: "...", inference: X}`** on conclusions = reasoning strength given premises (0-1). Never write `{credence}` on a conclusion -- credence is _computed_: `product(premise credences) * inference`, aggregated via log-odds. Reason always comes first.
+1. **`{reason: "...", credence: X}`** on premises = trust in source (0-1). **`{reason: "...", inference: X}`** on conclusions = reasoning strength given premises (0-1). Never write `{credence}` on a conclusion -- credence is _computed_: `product(premise credences) * inference`, aggregated via log-odds across arguments. Premises in one PCS are **joint conditions** (all must hold); use separate arguments for independent evidence. Reason always comes first.
 2. **Top-level claim** gets NO hardcoded credence. It's computed via log-odds aggregation.
 3. **Tag-specific requirements**:
   - **`#observation`**: MUST have source URL link + markdown blockquote + `{reason, credence}`.
@@ -343,3 +361,4 @@ To compare two agents' argument maps on the same topic:
 | Missing `{reason: "..."}`            | Always explain why this number, before the number                         |
 | `[...]` in blockquotes               | Use `(...)` instead -- parser treats `[x]` as statement refs              |
 | Using `><` for contradiction         | Use mutual `- [other]` contraries (see Pattern 4)                         |
+| Independent evidence in one PCS      | Split into separate arguments (1 premise each); log-odds combines them    |
