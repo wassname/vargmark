@@ -1,0 +1,9 @@
+{
+  "name": "vargdown-skill",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "mathjs": "^12.4.1",
+    "markdown-it": "^14.1.0"
+  }
+}
