@@ -167,7 +167,8 @@ Attacks the inference, not the premises. "Even if true, doesn't follow."
 <Collapse Risk>
 (1) [Collapse]: Shumailov 2024 showed recursive self-training degrades. #observation
     [Shumailov 2024](https://www.nature.com/articles/s41586-024-07566-y)
-    > "Model collapse is a degenerative process"
+    [evidence](evidence/shumailov_2024_model_collapse.md#L112-L116)
+    > We discover that learning from data produced by other models causes **model collapse -- a degenerative process whereby, over time, models forget the true underlying data distribution,** even in the absence of a shift in the distribution over time. We give examples of model collapse for Gaussian Mixture Models (GMMs), Variational Autoencoders (VAE) and Large Language models (LLMs). We show that over time we start losing information about the true distribution, which first starts with tails disappearing, and over the generations learned behaviours start converging to a point estimate with very small variance.
     {reason: "Nature paper, well-replicated", credence: 0.85}
 ----
 (2) [Naive Degrades]: Naive synthetic scaling degrades quality.
@@ -181,7 +182,7 @@ Attacks the inference, not the premises. "Even if true, doesn't follow."
 
 ```argdown
 // Contradiction: P(Risk Real) + P(Opportunity Cost) = 1
-[Risk Real]: AI catastrophe probability >= 5%. #observation
+[Risk Real]: AI catastrophe probability >= 5%. #assumption
   {reason: "expert survey median ~5-10%", credence: 0.70}
   - [Opportunity Cost]
 [Opportunity Cost]: Pausing delays millions of QALYs/year. #assumption
@@ -267,7 +268,7 @@ Tag with `#cluster-X` to flag shared evidence base:
 
 ```argdown
 <Economic Cost> #cluster-cost
-(1) [GDP Hit]: Sanctions could cost 7% of GDP. #observation
+(1) [GDP Hit]: Sanctions could cost 7% of GDP. #assumption
     {reason: "IMF estimates", credence: 0.70}
 ----
 (2) [Econ Deters]: Economic costs deter.
@@ -286,12 +287,12 @@ Tag with `#cluster-X` to flag shared evidence base:
 #### Base Rate Prior (Pattern 10)
 
 ```argdown
-[Base Rate]: Historical energy transitions take 50-70 years. #prior #observation
+[Base Rate]: Historical energy transitions take 50-70 years. #prior #assumption
   {reason: "Smil 2010 data", credence: 0.80, role: "prior", base_rate: 0.04}
   +> [Slow Transition]
 
 <Upward Update>
-(1) [New Signal]: Private fusion investment 10x in 5 years. #observation
+(1) [New Signal]: Private fusion investment 10x in 5 years. #assumption
     {reason: "documented but novel", credence: 0.75}
 ----
 (2) [Faster Than Base]: Update toward faster transition.
