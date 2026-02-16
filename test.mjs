@@ -16,7 +16,7 @@ function verifyArgdown(argdownPath) {
   const jsonPath = path.join(dir, stem + ".json");
 
   // Parse argdown -> JSON
-  execSync(`npx --yes @argdown/cli json "${argdownPath}" "${dir}"`, {
+  execSync(`npx @argdown/cli json "${argdownPath}" "${dir}"`, {
     cwd: ROOT,
     stdio: "pipe",
   });

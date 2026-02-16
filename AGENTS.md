@@ -5,14 +5,30 @@ How to develop and test changes to vargdown (the SKILL.md format, verify.mjs ver
 ## Cycle
 
 ```
-make change -> test with sub-agent -> review output -> address feedback -> commit
+make change -> npm test -> test with sub-agent -> review output -> address feedback -> commit
 ```
 
 ### 1. Make a change
 
 Edit SKILL.md (format/principles), verify.mjs (verifier), or supporting files.
 
-### 2. Test with a sub-agent
+### 2. Run unit tests
+
+```bash
+npm test
+```
+
+This runs `test.mjs` (Node.js built-in `node:test`). It covers:
+
+1. **SKILL.md example** -- extracts the argdown block from SKILL.md, parses it with the argdown CLI, and verifies it. Ensures the spec's own example stays valid.
+2. **test_patterns/** -- one test per `.argdown` file in `test_patterns/`. Each pattern exercises a specific feature (undercut, contradiction, multi-step PCS, subquestion, conditional, correlated sources, base rate).
+3. **examples/** -- one test per `.argdown` file in `examples/`. End-to-end examples produced by sub-agents or humans.
+
+To add a new test pattern: create `test_patterns/<name>.argdown` with supporting evidence files (there's a symlink `test_patterns/evidence -> ../evidence`). It will be picked up automatically.
+
+All tests must pass before committing.
+
+### 3. Test with a sub-agent
 
 Spawn a sub-agent that acts as a naive user of the skill. The sub-agent should:
 
@@ -46,7 +62,7 @@ You are testing the vargdown skill. Do NOT use HumanAgent MCP or contact the use
    - Paste the final .argdown content.
 ```
 
-### 3. Review
+### 4. Review
 
 Check the sub-agent's output:
 - Did it follow reason-before-credence ordering?
@@ -56,15 +72,14 @@ Check the sub-agent's output:
 
 If the sub-agent was confused by something, that's a signal SKILL.md needs clarifying.
 
-### 4. Address feedback
+### 5. Address feedback
 
 Fix whatever the sub-agent flagged. If SKILL.md was ambiguous, make it precise. If the verifier missed something, fix verify.mjs. Then re-run the test.
 
-### 5. Commit
+### 6. Commit
 
 ```bash
-npx @argdown/cli json examples/example.argdown examples
-node verify.mjs examples/example.json examples/example_verified.html
+npm test
 git add -A && git commit
 ```
 

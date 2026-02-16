@@ -683,14 +683,41 @@ function findSnippetSpan(text, snippet) {
   return [start, end];
 }
 
-function boldSnippet(paragraph, snippet) {
+/**
+ * Bold-highlight key fragments within the evidence paragraph.
+ * boldFragments: strings extracted from argdown bold ranges. If non-empty,
+ * only those phrases are bolded. Otherwise the entire quote span is bolded.
+ */
+function boldSnippet(paragraph, snippet, boldFragments) {
   const normalized = normalizeMarkdown(paragraph);
-  const span = findSnippetSpan(normalized, snippet);
-  if (!span) {
-    throw new Error(`Snippet not found in paragraph: ${snippet}`);
+
+  if (!boldFragments || boldFragments.length === 0) {
+    // No bold markers -- bold the whole quote span
+    const span = findSnippetSpan(normalized, snippet);
+    if (!span) {
+      throw new Error(`Snippet not found in paragraph: ${snippet}`);
+    }
+    const [start, end] = span;
+    return `${normalized.slice(0, start)}**${normalized.slice(start, end)}**${normalized.slice(end)}`;
   }
-  const [start, end] = span;
-  return `${normalized.slice(0, start)}**${normalized.slice(start, end)}**${normalized.slice(end)}`;
+
+  // Bold only the marked fragments within the paragraph
+  let result = normalized;
+  // Process in reverse order of position so insertions don't shift later indices
+  const spans = [];
+  for (const frag of boldFragments) {
+    // Use substring match for short key fragments (more precise than token matching)
+    const idx = result.toLowerCase().indexOf(frag.toLowerCase());
+    if (idx >= 0) {
+      spans.push([idx, idx + frag.length]);
+    }
+  }
+  // Apply in reverse order so indices stay valid
+  spans.sort((a, b) => b[0] - a[0]);
+  for (const [s, e] of spans) {
+    result = `${result.slice(0, s)}**${result.slice(s, e)}**${result.slice(e)}`;
+  }
+  return result;
 }
 
 function normalizeMarkdown(text) {
@@ -878,6 +905,10 @@ function renderArgument(argName, arg, statements, relations, baseDir = null) {
     lines.push(`<strong>${escapeHtml(title)}</strong>`);
 
     const quote = extractQuote(p.text || "");
+    // Extract bold fragments from argdown ranges
+    const boldFragments = (p.ranges || [])
+      .filter((r) => r.type === "bold")
+      .map((r) => (p.text || "").slice(r.start, r.stop + 1));
     if (quote) {
       if (linkUrl && baseDir) {
         const key = observationKey(linkUrl, quote);
@@ -885,7 +916,7 @@ function renderArgument(argName, arg, statements, relations, baseDir = null) {
         if (!paragraph) {
           throw new Error(`Missing cached paragraph for ${linkUrl}`);
         }
-        const paragraphWithBold = boldSnippet(paragraph, quote);
+        const paragraphWithBold = boldSnippet(paragraph, quote, boldFragments);
         const rendered = md.renderInline(paragraphWithBold);
         lines.push(`<blockquote>${rendered}</blockquote>`);
       } else {

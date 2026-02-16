@@ -1,8 +1,6 @@
 # vargdown - Verified Argument Maps
 
-Structured argument maps where every claim has a clickable source + exact quote, and the bottom line is computed via log-odds, not asserted.
-
-Goal: make it hard to the LLM to hallucinate, and easy for you to check.
+Goal: make it **hard** to the LLM to hallucinate, and **easy** for you to check.
 
 - 1st pass: automatic verification with code
 - 2nd pass: approximate verification by another agent (sub agent)
@@ -16,23 +14,35 @@ model:
     mode: strict
 ===
 
-<B>
+[Umbrella]: I should bring an umbrella today.
+  + <Forecast Says Rain>
+  - <Clear Sky Now>
 
-(1) [P2]: premise2 #assumption
-    {reason: "r", credence: 0.5}
+<Forecast Says Rain>
+
+(1) [Forecast]: The weather app says 70% chance of rain this afternoon. #assumption
+   [weatherzone](https://www.weatherzone.com.au/wa/perth/perth)(evidence/202060601_weatherzone_perth.md#L53-L53)
+   > Perth for Tuesday. Cloudy, **70% chance of afternoon showers**. Winds SE 20 to 30 km/h turning S/SW in the early afternoon then tending S/SE 15 to 20 km/h in the evening.
+    {reason: "data provided by the Bureau of Meteorology (BOM)", credence: 0.95}
 ----
-(2) [C2]: conclusion2
-    {reason: "r", inference: 0.6}
+(2) [Rain Likely]: It will probably rain today.
+    {reason: "BOM highly calibrated", inference: 0.70}
+  +> [Umbrella]
 
-<A>
+<Clear Sky Now>
 
-(1) [P1]: premise1 #assumption
-    {reason: "r", credence: 0.8}
+(1) [Blue Sky]: The sky is currently clear and blue. #assumption
+    {reason: "looking out the window right now", credence: 0.95}
 ----
-(2) [C1]: conclusion1
-    {reason: "r", inference: 0.7}
-  _> <B>
+(2) [Might Stay Dry]: It may not rain after all.
+    {reason: "current sky tells you almost nothing about 4pm -- weather changes fast", inference: 0.20}
+  -> [Umbrella]
 ```
+
+Output: `[Umbrella]` implied credence ~62% (forecast outweighs the weak con of current clear sky).
+
+**See [SKILL.md](./SKILL.md) for a realistic example with sources and quotes.
+
 
 ## Principles
 
@@ -51,28 +61,37 @@ ln -s /path/to/this/repo ~/.claude/skills/vargdown
 
 The skill file ([SKILL.md](SKILL.md)) is the single source of truth for how agents write argument maps.
 
+
 ## Quick start
 
 ```bash
 npm install
-npm install -g @argdown/cli
 npx @argdown/cli json examples/linear_probs.argdown examples
 node verify.mjs examples/linear_probs.json examples/linear_probs_verified.html
 ```
 
-Requires `node` and `npx` (argdown CLI).
+Open `examples/linear_probs_verified.html` in a browser to see the rendered argument map: colored cards with computed credences, clickable source links, bold-highlighted quotes, and a bottom-line number.
+
+Requires `node` (v20+).
+
+
+![example](image.png)
 
 ## How it works
 
-0. Agent searches for information, and saves it to ./evidence/
+0. Agent searches for information, saves evidence to `evidence/*.md` (each with `Source:` / `Title:` headers and verbatim body)
 1. Agent writes `.argdown` file following [SKILL.md](SKILL.md) format
-2. Agent run verified.mjs
-   1. Verifier checks: credence consistency, source attribution, inference math, graph structure
-3. Subagent provides external check
-4. Human checked
-   1. Output: HTML with colored cards, computed credences, and a bottom line number
+2. `@argdown/cli` parses `.argdown` to JSON
+3. `verify.mjs` checks: quote presence in evidence files, credence/inference ranges, required fields, graph structure, and computes the bottom-line credence via log-odds
+4. Output: standalone HTML with colored cards, source links, and computed credences
 
 See `examples/` for working argument maps. See [AGENTS.md](AGENTS.md) for the dev workflow.
+
+## Dev
+
+```bash
+npm test          # unit tests (SKILL.md example + test_patterns/ + examples/)
+```
 
 ## References
 

@@ -6,7 +6,10 @@
     "test": "node --test test.mjs"
   },
   "dependencies": {
-    "mathjs": "^12.4.1",
-    "markdown-it": "^14.1.0"
+    "markdown-it": "^14.1.0",
+    "mathjs": "^12.4.1"
+  },
+  "devDependencies": {
+    "@argdown/cli": "^1.7.5"
   }
 }
