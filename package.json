@@ -2,6 +2,9 @@
   "name": "vargdown-skill",
   "private": true,
   "type": "module",
+  "scripts": {
+    "test": "node --test test.mjs"
+  },
   "dependencies": {
     "mathjs": "^12.4.1",
     "markdown-it": "^14.1.0"

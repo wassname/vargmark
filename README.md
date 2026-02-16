@@ -30,15 +30,15 @@ The skill file ([SKILL.md](SKILL.md)) is the single source of truth for how agen
 ```bash
 npm install
 npm install -g @argdown/cli
-npx @argdown/cli json examples/example.argdown examples
-node verify.mjs examples/example.json examples/example_verified.html
+npx @argdown/cli json examples/linear_probs.argdown examples
+node verify.mjs examples/linear_probs.json examples/linear_probs_verified.html
 ```
 
 Requires `node` and `npx` (argdown CLI).
 
 ## How it works
 
-0. Agent searches for information, and saves it to ./evicence/
+0. Agent searches for information, and saves it to ./evidence/
 1. Agent writes `.argdown` file following [SKILL.md](SKILL.md) format
 2. Agent run verified.mjs
    1. Verifier checks: credence consistency, source attribution, inference math, graph structure
@@ -51,6 +51,3 @@ See `examples/` for working argument maps. See [AGENTS.md](AGENTS.md) for the de
 ## References
 
 - [Argdown syntax](https://argdown.org/syntax/)
-- [AI Safety via Debate](https://arxiv.org/abs/1805.00899) - Irving et al. 2018
-- [Scalable oversight](https://arxiv.org/abs/2211.03540) - Bowman et al. 2022
-TODO are these really relevent, or aspirational?

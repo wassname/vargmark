@@ -5,9 +5,11 @@ model:
 ===
 
 [Main Q]: Scaling laws hold to 10^29 FLOP.
+
 [Data Wall]: Data runs out before 10^29 FLOP. #crux #assumption
   {reason: "internet text is finite", credence: 0.60}
   - [Main Q]
+
 [Energy Wall]: Energy costs become prohibitive. #crux #assumption
   {reason: "current trajectory unsustainable", credence: 0.50}
   - [Main Q]

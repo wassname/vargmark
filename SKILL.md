@@ -185,6 +185,7 @@ Attacks the inference, not the premises. "Even if true, doesn't follow."
 [Risk Real]: AI catastrophe probability >= 5%. #assumption
   {reason: "expert survey median ~5-10%", credence: 0.70}
   - [Opportunity Cost]
+
 [Opportunity Cost]: Pausing delays millions of QALYs/year. #assumption
   {reason: "complement of Risk Real", credence: 0.30}
   - [Risk Real]
@@ -216,9 +217,13 @@ A crux with `- [Main Q]` means: if this crux is true, Main Q becomes less likely
 
 ```argdown
 [Main Q]: Scaling laws hold to 10^29 FLOP.
-[Data Wall]: Data runs out before 10^29 FLOP. #crux
+
+[Data Wall]: Data runs out before 10^29 FLOP. #crux #assumption
+  {reason: "internet text is finite", credence: 0.60}
   - [Main Q]
-[Energy Wall]: Energy costs become prohibitive. #crux
+
+[Energy Wall]: Energy costs become prohibitive. #crux #assumption
+  {reason: "current trajectory unsustainable", credence: 0.50}
   - [Main Q]
 ```
 
@@ -248,6 +253,7 @@ Weighing pro and con arguments {uses: [1, 2, 3]}
 [ITER Succeeds]: ITER achieves Q>10 by 2035. #assumption
   {reason: "behind schedule but possible", credence: 0.40}
   - [ITER Fails]
+
 [ITER Fails]: ITER does not achieve Q>10. #assumption
   {reason: "history of delays", credence: 0.60}
   - [ITER Succeeds]

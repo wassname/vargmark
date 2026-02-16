@@ -5,8 +5,6 @@ Verified argument map tool: verify + render in one step.
 Parses argdown JSON export, checks credence consistency, computes conclusions,
 and renders enriched HTML with credence coloring.
 
-TODO make verify and stdout only the default, render is optional
-
 Usage:
     node verify.mjs example.json                          # verify + render
     node verify.mjs example.json output.html              # specify output path

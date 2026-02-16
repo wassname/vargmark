@@ -11,6 +11,7 @@ model:
 [ITER Succeeds]: ITER achieves Q>10 by 2035. #assumption
   {reason: "behind schedule but possible", credence: 0.40}
   - [ITER Fails]
+
 [ITER Fails]: ITER does not achieve Q>10. #assumption
   {reason: "history of delays", credence: 0.60}
   - [ITER Succeeds]
