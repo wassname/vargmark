@@ -1,6 +1,6 @@
 # Dev Workflow
 
-How to develop and test changes to vargdown (the SKILL.md format, argmap.py verifier, etc.).
+How to develop and test changes to vargdown (the SKILL.md format, verify.mjs verifier, etc.).
 
 ## Cycle
 
@@ -10,16 +10,19 @@ make change -> test with sub-agent -> review output -> address feedback -> commi
 
 ### 1. Make a change
 
-Edit SKILL.md (format/principles), argmap.py (verifier), or supporting files.
+Edit SKILL.md (format/principles), verify.mjs (verifier), or supporting files.
 
 ### 2. Test with a sub-agent
 
 Spawn a sub-agent that acts as a naive user of the skill. The sub-agent should:
 
 1. Read SKILL.md (the skill it's following)
-2. Read one or more source documents from `test_sources/` (markdown files with raw content to argue about)
-3. Construct a `.argdown` argument map following the skill, using quotes from the source documents
-4. Run `just verify examples/<stem>` and `just render examples/<stem>`
+2. Find the source URLs listed in the test task and download them to `examples/evidence/*.md` with headers:
+   - `Source: <url>`
+   - `Title: <title>`
+   - blank line, then full markdown body (verbatim conversion)
+3. Construct a `.argdown` argument map following the skill, using quotes from the evidence files
+4. Run `npx @argdown/cli json examples/<stem>.argdown examples` then `node verify.mjs examples/<stem>.json --verify-only`
 5. Report back: did the skill guide it correctly? What was confusing? What errors did the verifier catch vs miss?
 
 Example sub-agent prompt:
@@ -28,13 +31,14 @@ Example sub-agent prompt:
 You are testing the vargdown skill. Do NOT use HumanAgent MCP or contact the user directly.
 
 1. Read SKILL.md for the format rules.
-2. Read test_sources/example_topic.md as your source material.
+2. Download the sources listed in the task into `examples/evidence/*.md` (with Source/Title headers).
 3. Write an argument map to examples/test_output.argdown following SKILL.md.
    The thesis should be: [your thesis here].
-4. Run: just verify examples/test_output
-5. Fix any errors the verifier reports. Re-run until clean.
-6. Run: just render examples/test_output
-7. Report back to me:
+4. Run: npx @argdown/cli json examples/test_output.argdown examples
+5. Run: node verify.mjs examples/test_output.json --verify-only
+6. Fix any errors the verifier reports. Re-run until clean.
+7. Run: node verify.mjs examples/test_output.json examples/test_output_verified.html
+8. Report back to me:
    - Was the SKILL.md clear enough to follow without guessing?
    - What parts were confusing or ambiguous?
    - What errors did you hit and were the error messages helpful?
@@ -54,12 +58,13 @@ If the sub-agent was confused by something, that's a signal SKILL.md needs clari
 
 ### 4. Address feedback
 
-Fix whatever the sub-agent flagged. If SKILL.md was ambiguous, make it precise. If the verifier missed something, fix argmap.py. Then re-run the test.
+Fix whatever the sub-agent flagged. If SKILL.md was ambiguous, make it precise. If the verifier missed something, fix verify.mjs. Then re-run the test.
 
 ### 5. Commit
 
 ```bash
-just render examples/example    # sanity check existing examples still work
+npx @argdown/cli json examples/example.argdown examples
+node verify.mjs examples/example.json examples/example_verified.html
 git add -A && git commit
 ```
 
@@ -92,7 +97,7 @@ Put markdown files in `test_sources/<topic>/` with raw content for the sub-agent
 #    - verifier ran clean?
 #    - computed bottom line is plausible?
 #
-# 3. If SKILL.md was ambiguous, fix it. If verifier missed something, fix argmap.py.
+# 3. If SKILL.md was ambiguous, fix it. If verifier missed something, fix verify.mjs.
 # 4. Re-run until the sub-agent produces clean output on first or second try.
 ```
 

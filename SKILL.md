@@ -1,10 +1,8 @@
 ---
 name: vargdown
-description: |
-  Write structured argument maps in Argdown strict mode (.argdown files) with
-  labeled premises, credences, and source verification. Use when analyzing
-  claims, building argument structures, or evaluating evidence chains.
-  Produces verifiable HTML via `just render`.
+description: Verified Argdown maps with credences and source quotes.
+metadata: 
+  - url: https://github.com/wassname/argument-formats
 ---
 
 # Verified Argument Maps (v-argdown)
@@ -13,20 +11,21 @@ Structured argument maps where every claim has a clickable source + exact quote,
 
 ## Usage
 
-1. Write `.argdown` file following this format
-2. Verify and fix errors until clean
+0. Use URLs for sources. Fetch each URL with markitdown and save a full markdown copy into `evidence/`.
+   - Command pattern: `markitdown {url} > evidence/{slug}.md`
+   - Required headers at top of each evidence file:
+     - `Source: <url>`
+     - `Title: <title>`
+     - blank line, then full markdown body (verbatim conversion)
+1. Write `.argdown` file following the below format (block qoutes, and link to evidence/{slug}.md#{line})
+2. Verify and fix errors until clean with verify.mjs
 3. Have a sub-agent review it: check all links resolve, skeptically review all reasoning, inference values, and credence assignments
-4. (optional) Render to HTML with colored cards and computed credences
+4. Render to HTML with colored cards and computed credences and ask human to review
 
 ```bash
-# with just (if available)
-just verify <stem>
-just render <stem>
-
-# without just
 npx @argdown/cli json <stem>.argdown "$(dirname <stem>)"
-uv run --with sympy --with networkx python argmap.py <stem>.json --verify-only   # verify
-uv run --with sympy --with networkx python argmap.py <stem>.json <stem>_verified.html  # render
+node verify.mjs <stem>.json --verify-only   # verify
+node verify.mjs <stem>.json <stem>_verified.html  # render
 ```
 
 ## Principles
@@ -36,7 +35,7 @@ uv run --with sympy --with networkx python argmap.py <stem>.json <stem>_verified
 The format lets machines verify the mechanical (quote matching, arithmetic, graph structure), weaker models verify the intermediate (inference plausibility, source relevance), and humans verify the cruxes -- each with minimal work per node.
 
 **1a. Proof travels with the claim.**
-Every observation exports URL + exact quote + frozen local copy. The judge never searches for evidence -- it's right there. Save source text to `evidence/` so verification uses a frozen copy, not a live URL that may break or change.
+Every observation exports URL + exact quote + frozen local copy. The judge never searches for evidence -- it's right there. The agent saves sources into `evidence/` so verification uses a frozen copy, not a live URL that may break or change.
 
 **1b. Observations have sources; inferences have reasons.**
 Observations are checked against their source quote. Inferences are checked against reasoning and stated credence. Each step is one or the other, never mixed.
@@ -58,41 +57,24 @@ model:
 
 [Closes Gap]: Structured argument maps with sourced quotes and
   computed credences close the verification gap in LLM-generated reasoning.
-  + <Debate Helps>
   + <Structure Helps>
   - <Overhead Cost>
 
 # Evidence For
-
-<Debate Helps>
-
-(1) [Debate]: Irving et al. 2018 propose AI safety via debate, where
-    agents argue opposing sides and a judge evaluates. #observation
-    [Irving et al. 2018](https://arxiv.org/abs/1805.00899)
-    > "we propose training agents via self play on a zero sum debate game"
-    {reason: "influential but empirical validation is limited", credence: 0.75}
-(2) [Oversight]: Bowman et al. 2022 argue scalable oversight requires
-    decomposing arguments so humans check small steps. #observation
-    [Bowman et al. 2022](https://arxiv.org/abs/2211.03540)
-    > "scalable oversight: the problem of supervising systems that potentially outperform us on most skills relevant to the task at hand"
-    {reason: "widely cited position paper from NYU alignment group", credence: 0.80}
-----
-(3) [Decomposition Works]: Breaking arguments into individually
-    checkable steps enables human verification at scale.
-    {reason: "plausible mechanism, but empirical evidence thin", inference: 0.70}
-  +> [Closes Gap]
 
 <Structure Helps>
 
 (1) [Arg Mapping]: Nesbit & Liu 2025 systematically reviewed 124
     studies on argument mapping in higher education. #observation
     [Nesbit & Liu 2025](https://doi.org/10.1111/hequ.70063)
-    > "the weight of evidence supports a recommendation that instructors use argument mapping to develop critical thinking and argumentation skills"
+    [evidence](evidence/nesbit_2025_argument_mapping.md#L9-L22)
+    > This systematic review examines research on the use of argument maps or diagrams by postsecondary students. The goals were to identify the themes, research questions, and results of systematically identified studies, and to assess the current prospects for meta-analyses. Relevant databases were searched for qualitative, observational and experimental studies. We coded 124 studies on research design, mapping software, student attitudes, collaborative mapping and thinking skills. There were 102 empirical studies, of which 44% assessed student attitudes toward argument mapping, 40% investigated collaborative argument mapping and 51% examined the quality or structure of student-constructed argument maps. **The causal relationship most frequently investigated was the effect of argument mapping on critical thinking skills.** We present the results from selected studies and consider their significance for learning design.
     {reason: "systematic review of 124 studies, but effect sizes vary and meta-analysis still needed", credence: 0.70}
 (2) [Hallucination Rate]: Safran & Cali 2025 find only 7.5% of
     LLM-generated references are fully accurate. #observation
     [Safran & Cali 2025](https://doi.org/10.38053/acmj.1746227)
-    > "Only 7.5% of references were fully accurate in the initial generation, while 42.5% were completely fabricated"
+    [evidence](evidence/safran_2025_hallucination.md#L134-L136)
+    > **Only 7.5% of references were fully accurate in the initial generation, while 42.5% were completely fabricated.** The remaining 50% were partially correct. After verification, the proportion of fully accurate references rose to 77.5%. Wilcoxon signed-rank testing confirmed a statistically significant improvement in accuracy across all prompts (W=561.0, p<0.001, r=0.60). The most common errors included invalid DOIs, fabricated article titles, and mismatched metadata.
     {reason: "small study (40 refs) but consistent with other findings", credence: 0.80}
 ----
 (3) [Forced Sourcing Helps]: Requiring URL + exact quote per claim
@@ -117,7 +99,7 @@ model:
   -> [Closes Gap]
 ```
 
-Output: `[Closes Gap]` implied credence ~66% (+0.67 log-odds; pro outweighs con for complex claims).
+Output: `[Closes Gap]` implied credence ~73% (+0.99 log-odds; pro outweighs con for complex claims).
 
 ---
 
@@ -139,7 +121,20 @@ Output: `[Closes Gap]` implied credence ~66% (+0.67 log-odds; pro outweighs con 
 1. **`{reason: "...", credence: X}`** on premises = trust in source (0-1). **`{reason: "...", inference: X}`** on conclusions = reasoning strength given premises (0-1). Never write `{credence}` on a conclusion -- credence is _computed_: `product(premise credences) * inference`, aggregated via log-odds. Reason always comes first.
 2. **Top-level claim** gets NO hardcoded credence. It's computed via log-odds aggregation.
 3. **Tag-specific requirements**:
-   - **`#observation`**: MUST have `[Label](url)` link + `> "exact quote"` blockquote + `{reason, credence}`. Save source text to `evidence/` so verification uses a frozen local copy. Link to the specific passage: `[Label](evidence/paper.md#L42)` for a line or `[Label](evidence/paper.md#L42-L55)` for a range. The renderer will inline the referenced text as a popup.
+  - **`#observation`**: MUST have source URL link + markdown blockquote + `{reason, credence}`.
+    - Quote style: include local context, not just a one-liner.
+      - Default target: quote at least 3-5 sentences total around the key claim.
+      - Include at least 1-2 sentences before and 1-2 after when available.
+      - Bold only the key fragment inside that larger excerpt.
+      - If the source only provides a single sentence (e.g., an abstract bullet), add a short comment explaining why no wider context exists.
+    - Link style:
+     - required: source URL link, e.g. `[Paper](https://...)`
+     - recommended: local evidence link with line range, e.g. `[evidence](evidence/paper.md#L120-L136)`
+  - The verifier matches quoted text against local `evidence/*.md`, then renders the matched paragraph with the key snippet bolded.
+   - **Evidence file format**: one `evidence/*.md` per URL with headers:
+     - `Source: <url>`
+     - `Title: <title>`
+     - blank line, then full markdown body (verbatim conversion)
    - **`#assumption`**: needs `{reason, credence}` but NO URL required.
    - **`#mechanism`**, **`#prior`**, **`#crux`**: same as `#assumption` (reason + credence, no URL required). Tag is metadata only.
 4. **ALL conclusions** must be named: `(3) [Name]: text`. Never bare sentences.
@@ -335,6 +330,7 @@ To compare two agents' argument maps on the same topic:
 | Unnamed conclusion `(3) Some text.`  | `(3) [Name]: Some text.`                                                  |
 | No URL on `#observation`             | Every observation needs `[Label](url)`                                    |
 | Blockquote is vague or a paper title | Find a specific declarative finding                                       |
+| Blockquote is a single sentence only | Expand to surrounding context (target 3-5 sentences; 1-2 before/after)    |
 | Paraphrasing in blockquote           | Use exact text; if paraphrasing: `> "paraphrase: ..."` and lower credence |
 | Multi-sentence inference             | Split into sub-arguments (Pattern 5)                                      |
 | Missing `{reason: "..."}`            | Always explain why this number, before the number                         |
