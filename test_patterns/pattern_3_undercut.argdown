@@ -1,0 +1,30 @@
+===
+title: Pattern 3 - Undercut
+model:
+    mode: strict
+===
+
+[Synthetic Data Works]: Synthetic data scaling improves model quality.
+  + <Synthetic Data Fix>
+  - <Collapse Risk>
+
+<Collapse Risk>
+
+(1) [Collapse]: Shumailov 2024 showed recursive self-training degrades. #observation
+    [Shumailov 2024](https://www.nature.com/articles/s41586-024-07566-y)
+    [evidence](evidence/shumailov_2024_model_collapse.md#L112-L116)
+    > We discover that learning from data produced by other models causes **model collapse -- a degenerative process whereby, over time, models forget the true underlying data distribution,** even in the absence of a shift in the distribution over time. We give examples of model collapse for Gaussian Mixture Models (GMMs), Variational Autoencoders (VAE) and Large Language models (LLMs). We show that over time we start losing information about the true distribution, which first starts with tails disappearing, and over the generations learned behaviours start converging to a point estimate with very small variance.
+    {reason: "Nature paper, well-replicated", credence: 0.85}
+----
+(2) [Naive Degrades]: Naive synthetic scaling degrades quality.
+    {reason: "direct implication", inference: 0.80}
+  -> [Synthetic Data Works]
+
+<Synthetic Data Fix>
+
+(1) [Filter Works]: Filtering synthetic data by quality score preserves distribution. #assumption
+    {reason: "some empirical support", credence: 0.60}
+----
+(2) [Filtered Scaling]: Quality-filtered synthetic data avoids collapse.
+    {reason: "depends on filter quality", inference: 0.50}
+  +> [Synthetic Data Works]

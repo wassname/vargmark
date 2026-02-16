@@ -1,0 +1,33 @@
+===
+title: Pattern 4 - Contradiction / Value Tension
+model:
+    mode: strict
+===
+
+[Pause AI]: AI development should be paused until safety is proven.
+  + <Risk Argument>
+  - <Opportunity Argument>
+
+// Contradiction: P(Risk Real) + P(Opportunity Cost) = 1
+[Risk Real]: AI catastrophe probability >= 5%. #assumption
+  {reason: "expert survey median ~5-10%", credence: 0.70}
+  - [Opportunity Cost]
+[Opportunity Cost]: Pausing delays millions of QALYs/year. #assumption
+  {reason: "complement of Risk Real", credence: 0.30}
+  - [Risk Real]
+
+<Risk Argument>
+
+(1) [Risk Real]
+----
+(2) [Safety First]: Risk level justifies precaution.
+    {reason: "depends on actual risk level", inference: 0.75}
+  +> [Pause AI]
+
+<Opportunity Argument>
+
+(1) [Opportunity Cost]
+----
+(2) [Progress Matters]: Delay costs outweigh safety gains.
+    {reason: "only if risk is low", inference: 0.60}
+  -> [Pause AI]

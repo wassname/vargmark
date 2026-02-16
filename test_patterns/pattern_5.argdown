@@ -1,0 +1,10 @@
+<Bottom Line>
+(1) [Pro Conclusion A]
+(2) [Pro Conclusion B]
+(3) [Con Conclusion C]
+--
+Weighing pro and con arguments {uses: [1, 2, 3]}
+--
+(4) [Verdict]: Net assessment after weighing all evidence.
+    {reason: "pro outweighs con but margin is thin", inference: 0.55}
+  +> [Main Claim]

@@ -1,0 +1,13 @@
+<Recursive Takeoff>
+(1) [No Ceiling]: No fundamental barrier at human level. #assumption
+    {reason: "no known theoretical ceiling", credence: 0.85}
+(2) [Self Improve]: Capable AI could improve its own training. #assumption
+    {reason: "speculative but plausible", credence: 0.50}
+----
+(3) [Rapid Gain]: Recursive self-improvement produces rapid capability gain.
+    {reason: "possible but not certain", inference: 0.40}
+(4) [Narrow Window]: Intervention window may be very short. #assumption
+    {reason: "depends on speed of recursive improvement", credence: 0.35}
+----
+(5) [Pause Buys Time]: A pause gives safety margin before recursive takeoff.
+    {reason: "only helps if takeoff is near", inference: 0.30}

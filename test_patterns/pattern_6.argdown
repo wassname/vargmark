@@ -1,0 +1,16 @@
+// Contradiction: exactly one scenario
+[ITER Succeeds]: ITER achieves Q>10 by 2035. #assumption
+  {reason: "behind schedule but possible", credence: 0.40}
+  - [ITER Fails]
+[ITER Fails]: ITER does not achieve Q>10. #assumption
+  {reason: "history of delays", credence: 0.60}
+  - [ITER Succeeds]
+
+<Fusion If ITER Succeeds>
+(1) [ITER Succeeds]
+(2) [Fast Commercialization]: Private sector scales quickly after proof. #assumption
+    {reason: "assumes regulatory cooperation", credence: 0.50}
+----
+(3) [Commercial Fusion Possible]: Commercial fusion reactors by 2045.
+    {reason: "10 years is aggressive for deployment", inference: 0.45}
+  +> [Fusion By 2045]

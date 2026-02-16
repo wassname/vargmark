@@ -1,0 +1,31 @@
+===
+title: Pattern 10 - Base Rate Prior
+model:
+    mode: strict
+===
+
+[Slow Transition]: Energy transitions follow historical 50-70 year timelines.
+  + <Historical Evidence>
+[Fast Transition]: This transition will be faster than historical norms.
+  + <Upward Update>
+
+[Base Rate]: Historical energy transitions take 50-70 years. #prior #assumption
+  {reason: "Smil 2010 data", credence: 0.80}
+  +> [Slow Transition]
+
+<Historical Evidence>
+
+(1) [Base Rate]
+----
+(2) [Default Slow]: Default expectation is slow transition.
+    {reason: "strong historical pattern", inference: 0.85}
+  +> [Slow Transition]
+
+<Upward Update>
+
+(1) [New Signal]: Private fusion investment 10x in 5 years. #assumption
+    {reason: "documented but novel", credence: 0.75}
+----
+(2) [Faster Than Base]: Update toward faster transition.
+    {reason: "investment != deployment", inference: 0.60}
+  +> [Fast Transition]

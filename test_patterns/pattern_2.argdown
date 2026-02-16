@@ -1,0 +1,7 @@
+// Contradiction: P(Risk Real) + P(Opportunity Cost) = 1
+[Risk Real]: AI catastrophe probability >= 5%. #assumption
+  {reason: "expert survey median ~5-10%", credence: 0.70}
+  - [Opportunity Cost]
+[Opportunity Cost]: Pausing delays millions of QALYs/year. #assumption
+  {reason: "complement of Risk Real", credence: 0.30}
+  - [Risk Real]
