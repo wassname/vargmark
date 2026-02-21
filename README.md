@@ -82,8 +82,10 @@ Requires `node` (v20+).
 0. Agent searches for information, saves evidence to `evidence/*.md` (each with `Source:` / `Title:` headers and verbatim body)
 1. Agent writes `.argdown` file following [SKILL.md](SKILL.md) format
 2. `@argdown/cli` parses `.argdown` to JSON
-3. `verify.mjs` checks: quote presence in evidence files, credence/inference ranges, required fields, graph structure, and computes the bottom-line credence via log-odds
+3. `compile_asp.mjs` compiles the JSON to ASP facts; `clingo-wasm` solves `rules.lp` constraints (ranges, entailment, cycles, isolation); `verify.mjs` also checks quote presence in evidence files, applies log-odds propagation, and renders HTML
 4. Output: standalone HTML with colored cards, source links, and computed credences
+
+Key files: `verify.mjs` (orchestrator), `compile_asp.mjs` (JSON→ASP facts), `rules.lp` (declarative constraints), `SKILL.md` (agent-facing format spec).
 
 See `examples/` for working argument maps. See [AGENTS.md](AGENTS.md) for the dev workflow.
 

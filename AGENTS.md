@@ -10,7 +10,14 @@ make change -> npm test -> test with sub-agent -> review output -> address feedb
 
 ### 1. Make a change
 
-Edit SKILL.md (format/principles), verify.mjs (verifier), or supporting files.
+Key files:
+- `SKILL.md` -- format rules and principles (LLM-facing)
+- `verify.mjs` -- orchestrator: loads JSON, calls ASP compiler, runs clingo-wasm, checks evidence, renders HTML
+- `compile_asp.mjs` -- compiles argdown JSON into ASP facts (integer basis points, collision-checked atom IDs)
+- `rules.lp` -- declarative verification rules (ranges, entailment, contrary, cycles, isolation)
+- `test.mjs` -- test runner
+
+To add a new verification rule: add it to `rules.lp` and a corresponding entry in the `violationToMessage` map in `verify.mjs`.
 
 ### 2. Run unit tests
 
