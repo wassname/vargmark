@@ -15,6 +15,7 @@ Edit SKILL.md (format/principles), verify.mjs (verifier), or supporting files.
 ### 2. Run unit tests
 
 ```bash
+npm install  # required on first use in a fresh worktree (node_modules not shared between worktrees)
 npm test
 ```
 

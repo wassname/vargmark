@@ -17,9 +17,13 @@ Structured argument maps where every claim has a clickable source + exact quote,
      - `Source: <url>`
      - `Title: <title>`
      - blank line, then full markdown body (verbatim conversion)
-1. Write `.argdown` file following the below format (block qoutes, and link to evidence/{slug}.md#{line})
+1. Write `.argdown` file following the below format (block quotes, and link to evidence/{slug}.md#{line})
 2. Verify and fix errors until clean with verify.mjs
-3. Have a sub-agent review it: check all links resolve, skeptically review all reasoning, inference values, and credence assignments
+3. Have an adversarial sub-agent review it. Task it explicitly:
+   a. **Load-bearing weak point**: find the `#assumption` with the most conclusions depending on it. Is the stated reason sufficient for its credence?
+   b. **Largest inference leap**: find the conclusion with the biggest drop from premise credences to its inference value. Is it justified?
+   c. **Quote fidelity**: spot-check 2-3 `#observation` quotes against their evidence files. Does the quote support the stated claim, or does it require surrounding context the argument omits?
+   d. Report findings **ranked by load-bearing impact** (highest risk first), not as a flat list. Output format: "Highest risk: [claim] because [reason]. Recommend: [action]."
 4. Render to HTML with colored cards and computed credences and ask human to review
 
 ```bash
@@ -39,6 +43,9 @@ Every observation exports URL + exact quote + frozen local copy. The judge never
 
 **1b. Observations have sources; inferences have reasons.**
 Observations are checked against their source quote. Inferences are checked against reasoning and stated credence. Each step is one or the other, never mixed.
+
+**1b2. Each claim is independently verifiable at its level.**
+Observations: checkable by reading only the quote + source, without domain expertise or context from the rest of the argument. Assumptions: assessable on their stated reason alone. Inferences: evaluable given only the stated premises and reason. If a leaf requires reading the rest of the argument to evaluate, split it or reclassify it.
 
 **1c. Reason first, credence second; bottom line is computed, never stated.**
 State why before how-much -- reasoning to a number, not post-hoc rationalization. Write `{reason: "...", credence: X}` not `{credence: X, reason: "..."}`. Within a PCS, conclusion credence = product(premise credences) * inference -- premises are **joint conditions** (all must hold). For independent evidence, use separate arguments; log-odds combines them across arguments. The top-level claim falls out of the math.
@@ -71,11 +78,11 @@ model:
     [Nesbit & Liu 2025](https://doi.org/10.1111/hequ.70063)
     [evidence](evidence/nesbit_2025_argument_mapping.md#L9-L22)
     > This systematic review examines research on the use of argument maps or diagrams by postsecondary students. The goals were to identify the themes, research questions, and results of systematically identified studies, and to assess the current prospects for meta-analyses. Relevant databases were searched for qualitative, observational and experimental studies. We coded 124 studies on research design, mapping software, student attitudes, collaborative mapping and thinking skills. There were 102 empirical studies, of which 44% assessed student attitudes toward argument mapping, 40% investigated collaborative argument mapping and 51% examined the quality or structure of student-constructed argument maps. **The causal relationship most frequently investigated was the effect of argument mapping on critical thinking skills.** We present the results from selected studies and consider their significance for learning design.
-    {reason: "systematic review of 124 studies, but effect sizes vary and meta-analysis still needed", credence: 0.70}
+    {reason: "full text behind paywall, abstract only; confirms 124 studies were coded but does not report effect sizes or confirm positive outcomes; for this argument, abstract-only access is acceptable, but obtaining the full text is a potential future refinement to update this credence", credence: 0.55}
 ----
-(2) [Mapping Helps Thinking]: Argument mapping improves critical
-    thinking, so structured maps aid verification.
-    {reason: "review shows mapping helps, but verification gap is a narrower claim", inference: 0.75}
+(2) [Mapping Helps Thinking]: Argument mapping may have some positive
+    effect on critical thinking, suggesting structured maps may aid verification.
+    {reason: "abstract describes mapping as the most-studied relation, not a confirmed benefit; domain transfer from postsecondary pedagogy to LLM verification is an additional unverified assumption", inference: 0.40}
   +> [Closes Gap]
 
 <Hallucination Problem>
@@ -88,8 +95,8 @@ model:
     {reason: "small study (40 refs) but consistent with other findings", credence: 0.80}
 ----
 (2) [Forced Sourcing Helps]: Requiring URL + exact quote per claim
-    makes hallucinated citations immediately visible.
-    {reason: "if quote must be verbatim, fabrication is caught on click", inference: 0.85}
+    makes hallucinated citations visible to a human reviewer.
+    {reason: "verbatim quote requirement forces a checkable artifact; but an LLM can also hallucinate the quote and evidence file, so this only fully holds when a human or independent tool verifies evidence files", inference: 0.60}
   +> [Closes Gap]
 
 # Evidence Against
@@ -117,7 +124,7 @@ model:
   -> [Closes Gap]
 ```
 
-Output: `[Closes Gap]` implied credence ~93% (+2.6 log-odds; pro outweighs con for complex claims).
+Output: `[Closes Gap]` -- pro arguments outweigh con for complex contested claims. Run `node verify.mjs` for the computed log-odds bottom line.
 
 ---
 
@@ -169,7 +176,13 @@ Output: `[Closes Gap]` implied credence ~93% (+2.6 log-odds; pro outweighs con f
 
 ### Verification
 
-The verifier checks: credence consistency, PCS math, graph structure, and contradiction constraints. It computes conclusion credences from premises and outputs a bottom-line assessment.
+Three layers, each handling what it's best at:
+
+| Layer | Who | Checks |
+|---|---|---|
+| Machine (verify.mjs) | Automated | Credence consistency, PCS arithmetic, graph structure, quote presence, field ordering |
+| Sub-agent (step 3) | Adversarial LLM | Inference plausibility, source relevance, load-bearing gap analysis |
+| Human (step 4) | You | Cruxes and judgment calls -- surfaced first in the HTML output |
 
 ---
 
@@ -344,6 +357,25 @@ To compare two agents' argument maps on the same topic:
 ```
 
 3. The arbiter merges into `topic_merged.argdown`, keeping the stronger-sourced version of each disputed claim, and noting disagreements as comments.
+
+### Background: Scalable Oversight Connection
+
+Vargdown is a lightweight implementation of scalable oversight principles from AI safety research.
+
+The goal in [AI safety via debate (Irving et al. 2018)](https://arxiv.org/abs/1805.00899) and [iterated amplification (Christiano et al. 2018)](https://arxiv.org/abs/1810.08575) is: how does a weak judge (human or small model) verify claims made by a strong agent, when the judge cannot independently evaluate complex outputs? Their answer -- recursive decomposition to atomic checkable sub-claims, plus an adversarial reviewer to find weak points -- is structurally what vargdown implements:
+
+| Debate / IA concept | Vargdown equivalent |
+|---|---|
+| Weak judge | Human reader (limited attention, time, expertise) |
+| Strong agent | LLM researcher writing the argument map |
+| Recursive decomposition | PCS chain: observation -> inference -> conclusion -> thesis |
+| Atomic verifiable leaf | `#observation` with URL + exact quote |
+| Adversarial reviewer | Sub-agent review (step 3) |
+| Argument tree | Argdown claim graph |
+
+**Where vargdown falls short of the formal ideal** (honest caveat): debate/IA assumes the adversarial reviewer is incentivized to find errors (game-theoretic). Here the sub-agent is just prompted to be skeptical -- it can be lazy or agree with the main agent. The format also relies on LLM compliance: nothing stops an agent from hallucinating a quote and evidence file. The machine verifier catches structural errors but not fabricated content. The goal is practical uptake and incremental improvement in argument quality, not formal completeness or game-theoretic guarantees.
+
+The format is designed so that these limitations are visible rather than hidden: every claim's evidence is co-located, machine checks are explicit, and the sub-agent review step is part of the documented workflow.
 
 ### Common Mistakes
 
