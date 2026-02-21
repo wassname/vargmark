@@ -23,12 +23,12 @@ import path from "node:path";
 import process from "node:process";
 import { create, all } from "mathjs";
 import MarkdownIt from "markdown-it";
+import clingoWasm from "clingo-wasm";
+import { compile } from "./compile_asp.mjs";
 
 const math = create(all, {});
 const md = new MarkdownIt({ html: false, linkify: false });
 const paragraphCache = new Map();
-
-const CONTRADICTION_TOLERANCE = 0.05; // credences should sum to 1.0 +/- this
 
 // --- Extraction ---
 
@@ -80,35 +80,7 @@ function extractRelations(data) {
   return relations;
 }
 
-// --- Verification checks ---
-
-function checkCredenceConsistency(statements, relations) {
-  const errors = [];
-  for (const rel of relations) {
-    const a = statements[rel.from] || {};
-    const b = statements[rel.to] || {};
-    const ca = a.credence;
-    const cb = b.credence;
-    if (ca == null || cb == null) {
-      continue;
-    }
-    const rtype = rel.relationType;
-    if (rtype === "entails" && cb < ca) {
-      errors.push(
-        `ENTAILMENT: [${rel.from}] (${ca}) entails [${rel.to}] (${cb}), but ${cb} < ${ca}.`
-      );
-    } else if (rtype === "contrary" && ca + cb > 1.0) {
-      errors.push(
-        `CONTRARY: [${rel.from}] (${ca}) + [${rel.to}] (${cb}) = ${(ca + cb).toFixed(2)} > 1.0.`
-      );
-    } else if (rtype === "contradictory" && Math.abs(ca + cb - 1.0) > CONTRADICTION_TOLERANCE) {
-      errors.push(
-        `CONTRADICTION: [${rel.from}] (${ca}) + [${rel.to}] (${cb}) = ${(ca + cb).toFixed(2)} != 1.0.`
-      );
-    }
-  }
-  return errors;
-}
+// --- Verification checks (JS-only: math) ---
 
 function checkMath(statements) {
   const errors = [];
@@ -138,210 +110,11 @@ function checkMath(statements) {
   return errors;
 }
 
-function buildAdjacency(edges) {
-  const adj = new Map();
-  for (const [u, v] of edges) {
-    if (!adj.has(u)) adj.set(u, new Set());
-    adj.get(u).add(v);
-  }
-  return adj;
-}
+// checkGraph, findEntailmentCycles, buildAdjacency: replaced by ASP rules (cycle, isolated)
 
-function findEntailmentCycles(nodes, entailmentEdges) {
-  const adj = buildAdjacency(entailmentEdges);
-  const cycles = new Set();
-  const visited = new Set();
-  const stack = [];
-  const inStack = new Set();
-
-  function dfs(node) {
-    visited.add(node);
-    stack.push(node);
-    inStack.add(node);
-
-    const neighbors = adj.get(node) || new Set();
-    for (const next of neighbors) {
-      if (!visited.has(next)) {
-        dfs(next);
-      } else if (inStack.has(next)) {
-        const idx = stack.indexOf(next);
-        if (idx >= 0) {
-          const cycle = stack.slice(idx).concat(next);
-          const key = cycle.join(" -> ");
-          cycles.add(key);
-        }
-      }
-    }
-
-    stack.pop();
-    inStack.delete(node);
-  }
-
-  for (const n of nodes) {
-    if (!visited.has(n)) {
-      dfs(n);
-    }
-  }
-  return Array.from(cycles);
-}
-
-function checkGraph(statements, relations, data) {
-  const errors = [];
-  const nodes = Object.keys(statements);
-  const entailmentEdges = [];
-  const degree = new Map();
-  for (const n of nodes) {
-    degree.set(n, 0);
-  }
-
-  for (const rel of relations) {
-    if (rel.relationType === "entails") {
-      entailmentEdges.push([rel.from, rel.to]);
-    }
-    if (degree.has(rel.from)) degree.set(rel.from, degree.get(rel.from) + 1);
-    if (degree.has(rel.to)) degree.set(rel.to, degree.get(rel.to) + 1);
-  }
-
-  const cycles = findEntailmentCycles(nodes, entailmentEdges);
-  for (const cycle of cycles) {
-    errors.push(`ENTAILMENT CYCLE: ${cycle}`);
-  }
-
-  const topLevel = new Set();
-  const st = data.statements || {};
-  for (const [title, ec] of Object.entries(st)) {
-    if (ec && ec.isUsedAsTopLevelStatement) {
-      topLevel.add(title);
-    }
-  }
-
-  for (const title of nodes) {
-    if ((degree.get(title) || 0) === 0 && topLevel.has(title)) {
-      errors.push(`ISOLATED: [${title}] is a top-level statement with no relations`);
-    }
-  }
-  return errors;
-}
-
-function checkFieldOrdering(data) {
-  const errors = [];
-  const statements = data.statements || {};
-  for (const [title, ec] of Object.entries(statements)) {
-    const d = (ec && ec.data) || {};
-    const keys = Object.keys(d);
-    if (keys.includes("reason") && (keys.includes("credence") || keys.includes("inference"))) {
-      const reasonIdx = keys.indexOf("reason");
-      const numIdx = keys.includes("credence") ? keys.indexOf("credence") : keys.indexOf("inference");
-      if (reasonIdx > numIdx) {
-        const field = keys.includes("credence") ? "credence" : "inference";
-        errors.push(`ORDERING: [${title}] has {${field}} before {reason} -- reason must come first`);
-      }
-    }
-  }
-
-  const argumentsData = data.arguments || {};
-  for (const [argName, arg] of Object.entries(argumentsData)) {
-    const pcs = (arg && arg.pcs) || [];
-    for (const m of pcs) {
-      const d = (m && m.data) || {};
-      const keys = Object.keys(d);
-      if (keys.includes("reason") && (keys.includes("credence") || keys.includes("inference"))) {
-        const reasonIdx = keys.indexOf("reason");
-        const numIdx = keys.includes("credence") ? keys.indexOf("credence") : keys.indexOf("inference");
-        if (reasonIdx > numIdx) {
-          const field = keys.includes("credence") ? "credence" : "inference";
-          const title = m.title || argName;
-          errors.push(
-            `ORDERING: [${title}] in <${argName}> has {${field}} before {reason} -- reason must come first`
-          );
-        }
-      }
-    }
-  }
-  return errors;
-}
-
-function checkPcsCredences(data, statements) {
-  const errors = [];
-  const notes = [];
-  const argumentsData = data.arguments || {};
-  for (const [argName, arg] of Object.entries(argumentsData)) {
-    const pcs = (arg && arg.pcs) || [];
-    if (pcs.length === 0) continue;
-
-    // Walk PCS in order: premises accumulate, conclusions consume them (staged)
-    let stagePremises = []; // [[title, credence], ...]
-    for (const m of pcs) {
-      const d = m.data || {};
-
-      if (m.role === "premise") {
-        if (d.credence != null) {
-          stagePremises.push([m.title, d.credence]);
-        }
-        // Error: conclusion uses {credence} (issue #3)
-        if (d.inference != null) {
-          errors.push(`PCS: <${argName}> premise [${m.title}] has {inference} -- only conclusions get inference`);
-        }
-        continue;
-      }
-
-      if (m.role === "intermediary-conclusion" || m.role === "main-conclusion") {
-        const inference = d.inference;
-        const hardcoded = d.credence;
-
-        // Error: conclusion uses {credence} instead of {inference} (issue #3)
-        if (hardcoded != null && inference == null) {
-          errors.push(
-            `PCS: <${argName}> [${m.title}] has {credence} on conclusion -- use {inference} instead (credence is computed)`
-          );
-        }
-
-        if (stagePremises.length === 0) continue;
-        const premiseProduct = stagePremises.reduce((acc, [, c]) => acc * c, 1.0);
-
-        if (inference != null) {
-          if (inference > 1.0 || inference < 0) {
-            errors.push(`PCS: <${argName}> [${m.title}] inference=${inference} out of range [0,1]`);
-          }
-          const computed = premiseProduct * inference;
-          const premiseStr = stagePremises.map(([, c]) => `${c}`).join(" * ");
-          notes.push(`  <${argName}>: [${m.title}]`);
-          notes.push(`    premises: ${premiseStr} = ${premiseProduct.toFixed(3)}`);
-          notes.push(`    inference: ${inference}`);
-          notes.push(
-            `    computed credence: ${premiseProduct.toFixed(3)} * ${inference} = ${computed.toFixed(2)}`
-          );
-          const rounded = Math.round(computed * 10000) / 10000;
-          if (statements[m.title]) {
-            statements[m.title].credence = rounded;
-            // Store PCS breakdown for bottom-line rendering
-            statements[m.title].pcsBreakdown = {
-              premises: stagePremises.map(([name, c]) => [name, c]),
-              inference,
-            };
-          }
-
-          // For multi-step: intermediary feeds into next stage as a premise
-          if (m.role === "intermediary-conclusion") {
-            stagePremises = [[m.title, rounded]];
-          }
-        } else if (hardcoded != null) {
-          if (hardcoded > premiseProduct) {
-            errors.push(
-              `PCS: <${argName}> [${m.title}] credence=${hardcoded} > product of premises (${premiseProduct.toFixed(3)})`
-            );
-          }
-          const implied = hardcoded / premiseProduct;
-          const premiseStr = stagePremises.map(([, c]) => `${c}`).join(" * ");
-          notes.push(`  <${argName}>: [${m.title}] credence=${hardcoded}`);
-          notes.push(`    premises: ${premiseStr} = ${premiseProduct.toFixed(3)}`);
-          notes.push(`    implied inference: ${hardcoded} / ${premiseProduct.toFixed(3)} = ${implied.toFixed(2)}`);
-        }
-      }
-    }
-  }
-  return [errors, notes];
-}
+// checkFieldOrdering: moved to compile_asp.mjs
+// checkPcsCredences: computation moved to compile_asp.mjs, application in verify()
+// checkTopLevelCredence, checkRequiredFields, checkRanges: replaced by ASP rules
 
 function cruxAnalysis(statements, relations) {
   const adj = new Map();
@@ -460,104 +233,98 @@ function formatPropagation(targets) {
   return lines;
 }
 
-// Issue #4: thesis statement (target of entails from PCS conclusions) must not have hardcoded credence
-function checkTopLevelCredence(data) {
-  const errors = [];
-  // Find statements that are targets of entails relations (thesis statements)
-  const entailTargets = new Set();
-  const st = data.statements || {};
-  for (const [, ec] of Object.entries(st)) {
-    for (const rel of (ec && ec.relations) || []) {
-      if (rel.relationType === "entails") {
-        entailTargets.add(rel.to);
-      }
-    }
+// --- Violation message mapping ---
+
+/** Map ASP violation atoms to human-readable error messages */
+function violationToMessage(v) {
+  // Parse violation/2 and violation/3
+  const m2 = v.match(/^violation\((\w+),(\w+)\)$/);
+  if (m2) {
+    const [, kind, a] = m2;
+    const msgs = {
+      missing_source: `MISSING SOURCE: [${a}] is tagged #observation but has no source URL`,
+      missing_quote: `MISSING QUOTE: [${a}] is tagged #observation but has no quote`,
+      top_level_credence: `TOP-LEVEL: [${a}] has hardcoded credence -- thesis credence should be computed, not stated`,
+      isolated: `ISOLATED: [${a}] is a top-level statement with no relations`,
+      cycle: `ENTAILMENT CYCLE: [${a}] is part of a cycle`,
+    };
+    return msgs[kind] || `${kind.toUpperCase()}: [${a}]`;
   }
-  const argumentsData = data.arguments || {};
-  for (const [, arg] of Object.entries(argumentsData)) {
-    for (const rel of (arg && arg.relations) || []) {
-      if (rel.relationType === "entails") {
-        entailTargets.add(rel.to);
-      }
-    }
+  const m3 = v.match(/^violation\((\w+),(\w+),(\w+)\)$/);
+  if (m3) {
+    const [, kind, a, b] = m3;
+    const msgs = {
+      range_low: `RANGE: premise [${b}] in <${a}> credence < 0`,
+      range_high: `RANGE: premise [${b}] in <${a}> credence > 1`,
+      inference_range_low: `RANGE: inference [${b}] in <${a}> < 0`,
+      inference_range_high: `RANGE: inference [${b}] in <${a}> > 1`,
+      missing_reason: `MISSING REASON: premise ${b} in <${a}> has no {reason}`,
+      missing_inference_reason: `MISSING REASON: conclusion [${b}] in <${a}> has no {reason}`,
+      credence_on_conclusion: `PCS: <${a}> [${b}] has {credence} on conclusion -- use {inference} instead`,
+      inference_on_premise: `PCS: <${a}> premise [${b}] has {inference} -- only conclusions get inference`,
+      entailment: `ENTAILMENT: [${a}] entails [${b}] but computed(${b}) < computed(${a})`,
+      contrary_sum: `CONTRARY: [${a}] + [${b}] > 1.0`,
+      contradiction_high: `CONTRADICTION: [${a}] + [${b}] too far above 1.0`,
+      contradiction_low: `CONTRADICTION: [${a}] + [${b}] too far below 1.0`,
+    };
+    return msgs[kind] || `${kind.toUpperCase()}: [${a}], [${b}]`;
   }
-  // Only flag entails targets that also have hardcoded credence
-  for (const title of entailTargets) {
-    const ec = st[title];
-    const d = (ec && ec.data) || {};
-    if (d.credence != null) {
-      errors.push(`TOP-LEVEL: [${title}] has {credence: ${d.credence}} -- thesis credence should be computed, not stated`);
-    }
-  }
-  return errors;
+  return v;
 }
 
-// Issue #5: {reason} is required on every credence/inference
-function checkRequiredFields(data) {
-  const errors = [];
-  function checkData(d, label) {
-    if (!d) return;
-    if ((d.credence != null || d.inference != null) && !d.reason) {
-      const field = d.credence != null ? "credence" : "inference";
-      errors.push(`MISSING REASON: ${label} has {${field}} but no {reason}`);
-    }
-  }
-  const statements = data.statements || {};
-  for (const [title, ec] of Object.entries(statements)) {
-    checkData((ec && ec.data) || {}, `[${title}]`);
-  }
-  const argumentsData = data.arguments || {};
-  for (const [argName, arg] of Object.entries(argumentsData)) {
-    for (const m of (arg && arg.pcs) || []) {
-      checkData(m.data || {}, `[${m.title || argName}] in <${argName}>`);
-    }
-  }
-  return errors;
-}
+// --- ASP verification ---
 
-// Issue #6: credence and inference must be in [0, 1]
-function checkRanges(data) {
-  const errors = [];
-  function checkData(d, label) {
-    if (!d) return;
-    if (d.credence != null && (d.credence < 0 || d.credence > 1)) {
-      errors.push(`RANGE: ${label} credence=${d.credence} out of [0, 1]`);
-    }
-    if (d.inference != null && (d.inference < 0 || d.inference > 1)) {
-      errors.push(`RANGE: ${label} inference=${d.inference} out of [0, 1]`);
-    }
+async function runAspVerification(data) {
+  const { facts, pcsResults, fieldOrderErrors } = compile(data);
+
+  const rulesPath = new URL("./rules.lp", import.meta.url);
+  const rules = fs.readFileSync(rulesPath, "utf8");
+  const program = facts.join("\n") + "\n" + rules;
+
+  const result = await clingoWasm.run(program, 0);
+  const witnesses = result.Call?.[0]?.Witnesses;
+  if (!witnesses || witnesses.length === 0) {
+    throw new Error(`ASP solver returned ${result.Result}: check rules.lp and compiled facts`);
   }
-  const statements = data.statements || {};
-  for (const [title, ec] of Object.entries(statements)) {
-    checkData((ec && ec.data) || {}, `[${title}]`);
-  }
-  const argumentsData = data.arguments || {};
-  for (const [argName, arg] of Object.entries(argumentsData)) {
-    for (const m of (arg && arg.pcs) || []) {
-      checkData(m.data || {}, `[${m.title || argName}] in <${argName}>`);
-    }
-  }
-  return errors;
+  const violations = witnesses[witnesses.length - 1].Value;
+  const aspErrors = violations.map(violationToMessage);
+
+  return { aspErrors, pcsResults, fieldOrderErrors };
 }
 
 // --- Verification runner ---
 
-function verify(data) {
+async function verify(data) {
   const statements = extractStatements(data);
   const relations = extractRelations(data);
 
-  const allErrors = [];
-  allErrors.push(...checkMath(statements));
-  allErrors.push(...checkGraph(statements, relations, data));
-  allErrors.push(...checkFieldOrdering(data));
-  allErrors.push(...checkRequiredFields(data));
-  allErrors.push(...checkRanges(data));
+  // Run ASP verification (structural checks)
+  const { aspErrors, pcsResults, fieldOrderErrors } = await runAspVerification(data);
 
-  // Compute conclusion credences first, then check consistency (issue #10)
-  const [pcsErrors, pcsNotes] = checkPcsCredences(data, statements);
-  allErrors.push(...pcsErrors);
-  allErrors.push(...checkCredenceConsistency(statements, relations));
-  allErrors.push(...checkTopLevelCredence(data));
+  // Apply PCS results to statements (computed credences + breakdown)
+  const pcsNotes = [];
+  for (const r of pcsResults) {
+    const computed = r.computed / 10000;
+    const rounded = Math.round(computed * 10000) / 10000;
+    if (statements[r.conclusion]) {
+      statements[r.conclusion].credence = rounded;
+      statements[r.conclusion].pcsBreakdown = {
+        premises: r.premises.map((p) => [p.title, p.bps / 10000]),
+        inference: r.inference / 10000,
+      };
+    }
+    const premiseStr = r.premises.map((p) => `${p.bps / 10000}`).join(" * ");
+    pcsNotes.push(`  <${r.argument}>: [${r.conclusion}]`);
+    pcsNotes.push(`    premises: ${premiseStr} = ${r.premises.reduce((acc, p) => acc * p.bps / 10000, 1.0).toFixed(3)}`);
+    pcsNotes.push(`    inference: ${r.inference / 10000}`);
+    pcsNotes.push(`    computed credence: ${computed.toFixed(2)}`);
+  }
+
+  // JS-only checks: math, field ordering
+  const allErrors = [];
+  allErrors.push(...aspErrors);
+  allErrors.push(...fieldOrderErrors);
+  allErrors.push(...checkMath(statements));
 
   const cruxNotes = cruxAnalysis(statements, relations);
 
@@ -1119,15 +886,25 @@ details.source-code pre {
       )} log-odds)</span></div>\n`;
       for (const [name, c] of t.via_entail) {
         const lo = Math.log(clampCredence(c) / (1 - clampCredence(c)));
-        html += `<div class="via">&uarr; ${escapeHtml(name)} (${Math.round(
+        const bd = statements[name]?.pcsBreakdown;
+        const mathStr = bd
+          ? bd.premises.map(([, v]) => `${Math.round(v * 100)}%`).join(" &times; ") +
+            ` &times; ${Math.round(bd.inference * 100)}% = `
+          : "";
+        html += `<div class="via">+ ${escapeHtml(name)}: ${mathStr}${Math.round(
           c * 100
-        )}%, ${lo >= 0 ? "+" : ""}${lo.toFixed(1)})</div>\n`;
+        )}% <span style="color:#888">(${lo >= 0 ? "+" : ""}${lo.toFixed(1)})</span></div>\n`;
       }
       for (const [name, c] of t.via_contrary) {
         const lo = Math.log(clampCredence(c) / (1 - clampCredence(c)));
-        html += `<div class="via">&darr; ${escapeHtml(name)} (${Math.round(
+        const bd = statements[name]?.pcsBreakdown;
+        const mathStr = bd
+          ? bd.premises.map(([, v]) => `${Math.round(v * 100)}%`).join(" &times; ") +
+            ` &times; ${Math.round(bd.inference * 100)}% = `
+          : "";
+        html += `<div class="via">- ${escapeHtml(name)}: ${mathStr}${Math.round(
           c * 100
-        )}%, ${lo >= 0 ? "+" : ""}${lo.toFixed(1)})</div>\n`;
+        )}% <span style="color:#888">(${lo >= 0 ? "+" : ""}${lo.toFixed(1)})</span></div>\n`;
       }
     }
     html += "</div>\n";
@@ -1199,28 +976,31 @@ function main() {
   const data = JSON.parse(raw);
 
   ensureEvidence(data, baseDir);
-  const [exitCode, statements, relations] = verify(data);
-
-  if (verifyOnly) {
-    process.exit(exitCode);
-  }
-
-  let argdownSource = null;
-  if (input) {
-    const dir = path.dirname(input);
-    const base = path.basename(input, path.extname(input));
-    const argdownPath = path.join(dir, `${base}.argdown`);
-    if (fs.existsSync(argdownPath)) {
-      argdownSource = fs.readFileSync(argdownPath, "utf8");
+  verify(data).then(([exitCode, statements, relations]) => {
+    if (verifyOnly) {
+      process.exit(exitCode);
     }
-  }
 
-  const outputPath = output || "example_verified.html";
-  const html = renderHtml(data, statements, relations, argdownSource, baseDir);
-  fs.writeFileSync(outputPath, html);
-  console.log(`\nRendered to ${outputPath}`);
+    let argdownSource = null;
+    if (input) {
+      const dir = path.dirname(input);
+      const base = path.basename(input, path.extname(input));
+      const argdownPath = path.join(dir, `${base}.argdown`);
+      if (fs.existsSync(argdownPath)) {
+        argdownSource = fs.readFileSync(argdownPath, "utf8");
+      }
+    }
 
-  process.exit(exitCode);
+    const outputPath = output || "example_verified.html";
+    const html = renderHtml(data, statements, relations, argdownSource, baseDir);
+    fs.writeFileSync(outputPath, html);
+    console.log(`\nRendered to ${outputPath}`);
+
+    process.exit(exitCode);
+  }).catch((err) => {
+    console.error(err.message);
+    process.exit(1);
+  });
 }
 
 main();
