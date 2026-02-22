@@ -65,9 +65,13 @@ The skill file ([SKILL.md](SKILL.md)) is the single source of truth for how agen
 ## Quick start
 
 ```bash
-npm install
-npx @argdown/cli json examples/linear_probs.argdown examples
-node verify.mjs examples/linear_probs.json examples/linear_probs_verified.html
+npx @argdown/cli json examples/linear_probs.argdown examples && node verify.mjs examples/linear_probs.json examples/linear_probs_verified.html
+```
+
+Optional verify-only pass (no HTML render):
+
+```bash
+npx @argdown/cli json examples/linear_probs.argdown examples && node verify.mjs examples/linear_probs.json --verify-only
 ```
 
 Open `examples/linear_probs_verified.html` in a browser to see the rendered argument map: colored cards with computed credences, clickable source links, bold-highlighted quotes, and a bottom-line number.
