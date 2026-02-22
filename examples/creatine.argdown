@@ -1,0 +1,62 @@
+===
+title: Does Creatine Supplementation Improve Cognitive Performance?
+author: vargdown agent
+model:
+    mode: strict
+===
+
+[Creatine Improves Cognition]: Creatine supplementation improves cognitive
+  performance in healthy adults.
+  + <Systematic Review Evidence>
+  + <Vegetarian RCT Evidence>
+  - <Largest RCT Equivocal>
+
+# Evidence For
+
+<Systematic Review Evidence>
+
+(1) [SR Finds Benefit]: Avgerinos et al. 2018 systematically reviewed 6
+    RCTs (281 individuals) and found evidence that creatine improves
+    short-term memory and intelligence/reasoning. #observation
+    [Avgerinos et al. 2018](https://pubmed.ncbi.nlm.nih.gov/29704637/)
+    [evidence](evidence/avgerinos_2018_creatine_cognition.md#L14-L15)
+    > Results: Six studies (281 individuals) met our inclusion criteria. Generally, there was **evidence that short term memory and intelligence/reasoning may be improved by creatine administration**. Regarding other cognitive domains, such as long-term memory, spatial memory, memory scanning, attention, executive function, response inhibition, word fluency, reaction time and mental fatigue, the results were conflicting. Performance on cognitive tasks stayed unchanged in young individuals. Vegetarians responded better than meat-eaters in memory tasks but for other cognitive domains no differences were observed.
+    {reason: "systematic review of 6 RCTs but small total N=281 and mixed results across domains", credence: 0.65}
+----
+(2) [SR Supports Cognition]: Systematic review evidence supports a
+    modest cognitive benefit of creatine, at least for memory and reasoning.
+    {reason: "evidence is positive for some domains but conflicting for others, and only in subgroups", inference: 0.60}
+  +> [Creatine Improves Cognition]
+
+<Vegetarian RCT Evidence>
+
+(1) [Rae RCT Result]: Rae et al. 2003 found creatine supplementation
+    (5g/day for 6 weeks) had a highly significant positive effect on
+    working memory and intelligence in 45 vegetarian subjects. #observation
+    [Rae et al. 2003](https://pubmed.ncbi.nlm.nih.gov/14561278/)
+    [evidence](evidence/rae_2003_creatine_cognition.md#L9-L11)
+    > Creatine plays a pivotal role in brain energy homeostasis, being a temporal and spatial buffer for cytosolic and mitochondrial pools of the cellular energy currency, adenosine triphosphate and its regulator, adenosine diphosphate. In this work, we tested the hypothesis that oral creatine supplementation (5 g d(-1) for six weeks) would enhance intelligence test scores and working memory performance in 45 young adult, vegetarian subjects in a double-blind, placebo-controlled, cross-over design. **Creatine supplementation had a significant positive effect (p < 0.0001) on both working memory (backward digit span) and intelligence (Raven's Advanced Progressive Matrices)**, both tasks that require speed of processing. These findings underline a dynamic and significant role of brain energy capacity in influencing brain performance.
+    {reason: "strong p-value and crossover design, but small N=45 and vegetarians only", credence: 0.70}
+----
+(2) [RCT Supports Cognition]: A well-controlled RCT showing large
+    effects on working memory supports the cognitive benefit hypothesis.
+    {reason: "strong effect but only in vegetarians who may have low baseline creatine", inference: 0.55}
+  +> [Creatine Improves Cognition]
+
+# Evidence Against
+
+<Largest RCT Equivocal>
+
+(1) [Sandkuhler Result]: Sandkuhler et al. 2023, the largest RCT to date
+    (N=123), found only borderline significance for working memory and
+    no significant effect on intelligence. #observation
+    [Sandkuhler et al. 2023](https://pubmed.ncbi.nlm.nih.gov/37968687/)
+    [evidence](evidence/sandkuhler_2023_creatine_cognition.md#L17-L18)
+    > Results: Bayesian evidence supported a small beneficial effect of creatine. **The creatine effect bordered significance for BDS (p = 0.064, eta2P = 0.029) but not RAPM (p = 0.327, eta2P = 0.008).** There was no indication that creatine improved the performance of our exploratory cognitive tasks. Side effects were reported significantly more often for creatine than for placebo supplementation (p = 0.002, RR = 4.25). Vegetarians did not benefit more from creatine than omnivores.
+    {reason: "largest and most recent RCT, preregistered crossover design, failed to replicate Rae 2003", credence: 0.80}
+----
+(2) [Weak Effect]: The largest and best-powered study found at most
+    a small borderline effect, suggesting earlier positive results may
+    have been inflated.
+    {reason: "failure to replicate at p<0.05 in larger sample is meaningful but Bayesian analysis still slightly favors effect", inference: 0.55}
+  -> [Creatine Improves Cognition]
