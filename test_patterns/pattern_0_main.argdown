@@ -21,11 +21,11 @@ model:
     [Nesbit & Liu 2025](https://doi.org/10.1111/hequ.70063)
     [evidence](evidence/nesbit_2025_argument_mapping.md#L9-L22)
     > This systematic review examines research on the use of argument maps or diagrams by postsecondary students. The goals were to identify the themes, research questions, and results of systematically identified studies, and to assess the current prospects for meta-analyses. Relevant databases were searched for qualitative, observational and experimental studies. We coded 124 studies on research design, mapping software, student attitudes, collaborative mapping and thinking skills. There were 102 empirical studies, of which 44% assessed student attitudes toward argument mapping, 40% investigated collaborative argument mapping and 51% examined the quality or structure of student-constructed argument maps. **The causal relationship most frequently investigated was the effect of argument mapping on critical thinking skills.** We present the results from selected studies and consider their significance for learning design.
-    {reason: "systematic review of 124 studies, but effect sizes vary and meta-analysis still needed", credence: 0.70}
+    {reason: "full text behind paywall, abstract only; confirms 124 studies were coded but does not report effect sizes or confirm positive outcomes; for this argument, abstract-only access is acceptable, but obtaining the full text is a potential future refinement to update this credence", credence: 0.55}
 ----
-(2) [Mapping Helps Thinking]: Argument mapping improves critical
-    thinking, so structured maps aid verification.
-    {reason: "review shows mapping helps, but verification gap is a narrower claim", inference: 0.75}
+(2) [Mapping Helps Thinking]: Argument mapping may have some positive
+    effect on critical thinking, suggesting structured maps may aid verification.
+    {reason: "abstract describes mapping as the most-studied relation, not a confirmed benefit; domain transfer from postsecondary pedagogy to LLM verification is an additional unverified assumption", inference: 0.40}
   +> [Closes Gap]
 
 <Hallucination Problem>
@@ -38,8 +38,8 @@ model:
     {reason: "small study (40 refs) but consistent with other findings", credence: 0.80}
 ----
 (2) [Forced Sourcing Helps]: Requiring URL + exact quote per claim
-    makes hallucinated citations immediately visible.
-    {reason: "if quote must be verbatim, fabrication is caught on click", inference: 0.85}
+    makes hallucinated citations visible to a human reviewer.
+    {reason: "verbatim quote requirement forces a checkable artifact; but an LLM can also hallucinate the quote and evidence file, so this only fully holds when a human or independent tool verifies evidence files", inference: 0.60}
   +> [Closes Gap]
 
 # Evidence Against

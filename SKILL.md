@@ -11,25 +11,33 @@ Structured argument maps where every claim has a clickable source + exact quote,
 
 ## Usage
 
-0. Use URLs for sources. Fetch each URL with markitdown and save a full markdown copy into `evidence/`.
-   - Command pattern: `markitdown {url} > evidence/{slug}.md`
-   - Required headers at top of each evidence file:
-     - `Source: <url>`
-     - `Title: <title>`
-     - blank line, then full markdown body (verbatim conversion)
-1. Write `.argdown` file following the below format (block quotes, and link to evidence/{slug}.md#{line})
-2. Verify and fix errors until clean with verify.mjs
-3. Have an adversarial sub-agent review it. Task it explicitly:
+The key principle: **sub-agents are adversarial like a debate**. The main agent never does the substantive work or review -- it only orchestrates and consolidates.
+
+0. Fetch sources. For each URL: `markitdown {url} > evidence/{slug}.md`. Required headers:
+   - `Source: <url>`
+   - `Title: <title>`
+   - blank line, then full markdown body (verbatim conversion)
+1. Spawn a **worker sub-agent** to write and verify the map:
+   - Read SKILL.md, download sources into `evidence/`, write `.argdown` following the format
+   - Run `npx @argdown/cli json <stem>.argdown <dir>` then `node verify.mjs <stem>.json --verify-only`
+   - Fix verifier errors and re-run until clean
+   - Report back: what was confusing? what errors did the verifier catch? paste final `.argdown`
+2. Spawn a separate **adversarial reviewer sub-agent** on the worker's output using a rubric:
    a. **Load-bearing weak point**: find the `#assumption` with the most conclusions depending on it. Is the stated reason sufficient for its credence?
    b. **Largest inference leap**: find the conclusion with the biggest drop from premise credences to its inference value. Is it justified?
    c. **Quote fidelity**: spot-check 2-3 `#observation` quotes against their evidence files. Does the quote support the stated claim, or does it require surrounding context the argument omits?
-   d. Report findings **ranked by load-bearing impact** (highest risk first), not as a flat list. Output format: "Highest risk: [claim] because [reason]. Recommend: [action]."
+  d. Score each finding with a severity credence using this scale:
+    - structural/factual error: 0.9
+    - major calibration issue: 0.7
+    - minor calibration/style issue: 0.4
+  e. Report findings **ranked by expected impact = load-bearing impact * severity credence**. Format: "Highest risk: [claim] because [reason]. Recommend: [action]."
+3. **Main agent consolidates only**: for each reviewer finding, trace it to the matching claim, accept or reject with reasoning, output a ranked list of changes needed. Human decides which to apply.
 4. Render to HTML with colored cards and computed credences and ask human to review
 
 ```bash
-npx @argdown/cli json <stem>.argdown "$(dirname <stem>)"
-node verify.mjs <stem>.json --verify-only   # verify
-node verify.mjs <stem>.json <stem>_verified.html  # render
+npx @argdown/cli json <stem>.argdown "$(dirname <stem>)" && node verify.mjs <stem>.json <stem>_verified.html
+# optional verify-only run:
+# npx @argdown/cli json <stem>.argdown "$(dirname <stem>)" && node verify.mjs <stem>.json --verify-only
 ```
 
 ## Principles
@@ -143,7 +151,7 @@ Output: `[Closes Gap]` -- pro arguments outweigh con for complex contested claim
 
 ### Key Rules (deviations from standard Argdown)
 
-1. **`{reason: "...", credence: X}`** on premises = trust in source (0-1). **`{reason: "...", inference: X}`** on conclusions = reasoning strength given premises (0-1). Never write `{credence}` on a conclusion -- credence is _computed_: `product(premise credences) * inference`, aggregated via log-odds across arguments. Premises in one PCS are **joint conditions** (all must hold); use separate arguments for independent evidence. Reason always comes first.
+1. **`{reason: "...", credence: X}`** on premises = how much you trust the source's own finding is accurately reported and methodologically sound (0-1). Whether that finding supports YOUR thesis goes in the inference step. **`{reason: "...", inference: X}`** on conclusions = reasoning strength given premises (0-1). Never write `{credence}` on a conclusion -- credence is _computed_: `product(premise credences) * inference`, aggregated via log-odds across arguments. Premises in one PCS are **joint conditions** (all must hold); use separate arguments for independent evidence. Reason always comes first.
 2. **Top-level claim** gets NO hardcoded credence. It's computed via log-odds aggregation.
 3. **Tag-specific requirements**:
   - **`#observation`**: MUST have source URL link + markdown blockquote + `{reason, credence}`.
@@ -181,7 +189,7 @@ Three layers, each handling what it's best at:
 | Layer | Who | Checks |
 |---|---|---|
 | Machine (verify.mjs) | Automated | Credence consistency, PCS arithmetic, graph structure, quote presence, field ordering |
-| Sub-agent (step 3) | Adversarial LLM | Inference plausibility, source relevance, load-bearing gap analysis |
+| Sub-agent (step 2) | Adversarial LLM | Inference plausibility, source relevance, load-bearing gap analysis |
 | Human (step 4) | You | Cruxes and judgment calls -- surfaced first in the HTML output |
 
 ---
@@ -301,7 +309,7 @@ Weighing pro and con arguments {uses: [1, 2, 3]}
 
 #### Correlated Arguments (Pattern 9)
 
-Tag with `#cluster-X` to flag shared evidence base:
+Tag with `#cluster-X` to flag shared evidence base. Clustered arguments are NOT independent -- the verifier flags them for human review but currently does not discount the log-odds aggregation. When two arguments share evidence (e.g., an RCT that is also included in a systematic review), tag both with the same cluster to warn readers about double-counting:
 
 ```argdown
 <Economic Cost> #cluster-cost
@@ -337,26 +345,50 @@ Tag with `#cluster-X` to flag shared evidence base:
   +> [Fast Transition]
 ```
 
-### Ensemble Mode
+### Ensemble Mode (procedural)
 
-To compare two agents' argument maps on the same topic:
+Use this when you want stronger oversight by aggregating multiple workers.
 
-1. Agent A writes `topic_a.argdown`, Agent B writes `topic_b.argdown`
-2. A third agent reads both and produces a comparison:
+1. Spawn `n` worker sub-agents with the same thesis and source set (`n=3` recommended).
+2. Each worker writes and verifies its own map (`topic_w1.argdown`, `topic_w2.argdown`, ...).
+3. Spawn one judge sub-agent that reads all worker outputs and produces:
+  - a rubric score per map (0-1) on four axes:
+    - quote fidelity (weight 0.35)
+    - inference calibration (weight 0.30)
+    - structural completeness (weight 0.20)
+    - crux identification quality (weight 0.15)
+  - a per-claim disagreement table with judge credence for each disputed claim
+4. Compute aggregate map-level score:
+
+$$
+S(map) = 0.35 q + 0.30 c + 0.20 s + 0.15 r
+$$
+
+where $q$ = quote fidelity, $c$ = calibration, $s$ = structural completeness, $r$ = crux quality.
+
+5. Consolidation suggestion:
+  - keep claims present in the top-2 scoring maps unless judge marks them as structural/factual error
+  - for disputed claims, keep the version with higher judge credence and better source coverage
+  - preserve minority disagreement as comments when disagreement credence remains perhaps >= 0.30
+6. Write `topic_merged.argdown`, re-run verifier, then run one adversarial reviewer on the merged map.
+
+The judge output should include a compact comparison table:
+
+1. Worker A writes `topic_a.argdown`, Worker B writes `topic_b.argdown`
+2. Judge agent reads both and produces a comparison:
 
 ```
 ## Comparison: [Topic]
-|                    | Agent A          | Agent B          |
+|                    | Worker A         | Worker B         |
 |--------------------|------------------|------------------|
 | Thesis credence    | 0.42             | 0.58             |
 | # pro arguments    | 3                | 2                |
 | # con arguments    | 2                | 3                |
-| Key disagreement   | [Claim X]: A=0.8, B=0.3 |          |
+| Rubric score       | 0.63             | 0.57             |
+| Key disagreement   | [Claim X]: A=0.8, B=0.3, judge=0.45 | |
 | Missing in A       | [Claim Y]        |                  |
 | Missing in B       | [Claim Z]        |                  |
 ```
-
-3. The arbiter merges into `topic_merged.argdown`, keeping the stronger-sourced version of each disputed claim, and noting disagreements as comments.
 
 ### Background: Scalable Oversight Connection
 

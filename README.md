@@ -20,8 +20,9 @@ model:
 
 <Forecast Says Rain>
 
-(1) [Forecast]: The weather app says 70% chance of rain this afternoon. #assumption
-   [weatherzone](https://www.weatherzone.com.au/wa/perth/perth)(evidence/202060601_weatherzone_perth.md#L53-L53)
+(1) [Forecast]: The weather app says 70% chance of rain this afternoon. #observation
+   [weatherzone](https://www.weatherzone.com.au/wa/perth/perth)
+   [evidence](evidence/202060601_weatherzone_perth.md#L53-L53)
    > Perth for Tuesday. Cloudy, **70% chance of afternoon showers**. Winds SE 20 to 30 km/h turning S/SW in the early afternoon then tending S/SE 15 to 20 km/h in the evening.
     {reason: "data provided by the Bureau of Meteorology (BOM)", credence: 0.95}
 ----
@@ -50,6 +51,7 @@ Output: `[Umbrella]` implied credence ~62% (forecast outweighs the weak con of c
 
 - **1a. Proof travels with the claim.** Every observation exports URL + exact quote + frozen local copy (`evidence/`). The judge never searches -- it's right there.
 - **1b. Observations have sources; inferences have reasons.** Each step is one or the other, never mixed. Observations are checked against their source; inferences against reasoning and stated credence.
+- **1b2. Each node in the argument tree is independently verifiable at its level.** Observations (leaves): readable from the quote alone, no domain expertise or wider context needed. Inferences (branches): evaluable given only the stated premises and reason. Thesis (root): computed from the log-odds of all branches, never manually stated. Each tier is checkable by a different verifier: machine checks structure, sub-agent checks inference plausibility, human checks cruxes.
 - **1c. Reason first, credence second; bottom line is computed, never stated.** State why before how-much. The top-level claim falls out of the math.
 
 ## Install as agent skill
@@ -83,11 +85,12 @@ Requires `node` (v20+).
 
 ## How it works
 
-0. Agent searches for information, saves evidence to `evidence/*.md` (each with `Source:` / `Title:` headers and verbatim body)
-1. Agent writes `.argdown` file following [SKILL.md](SKILL.md) format
-2. `@argdown/cli` parses `.argdown` to JSON
-3. `verify.mjs` checks: quote presence in evidence files, credence/inference ranges, required fields, graph structure, and computes the bottom-line credence via log-odds
-4. Output: standalone HTML with colored cards, source links, and computed credences
+0. Fetch sources into `evidence/*.md` (each with `Source:` / `Title:` headers and verbatim body)
+1. Worker sub-agent writes `.argdown` file following [SKILL.md](SKILL.md) format
+2. `@argdown/cli` parses `.argdown` to JSON, `verify.mjs` checks structure + computes bottom-line credence
+3. Adversarial reviewer sub-agent attacks the map (load-bearing weak points, inference leaps, quote fidelity)
+4. Main agent consolidates findings; human decides which changes to apply
+5. Output: standalone HTML with colored cards, source links, and computed credences
 
 See `examples/` for working argument maps. See [AGENTS.md](AGENTS.md) for the dev workflow.
 

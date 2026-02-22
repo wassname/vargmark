@@ -9,7 +9,7 @@ Does creatine supplementation improve cognitive performance in healthy adults?
 Use the following source URLs:
 - https://pubmed.ncbi.nlm.nih.gov/29704637/ (Avgerinos 2018 systematic review)
 - https://pubmed.ncbi.nlm.nih.gov/14561278/ (Rae 2003 RCT)
-- https://pubmed.ncbi.nlm.nih.gov/31471173/ (Sandkuhler 2023 RCT)
+- https://pubmed.ncbi.nlm.nih.gov/37968687/ (Sandkuhler 2023 RCT)
 
 ## Instructions
 

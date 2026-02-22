@@ -5,7 +5,7 @@ How to develop and test changes to vargdown (the SKILL.md format, verify.mjs ver
 ## Cycle
 
 ```
-make change -> npm test -> test with sub-agent -> review output -> address feedback -> commit
+make change -> npm test -> worker sub-agent -> review output -> address feedback -> commit
 ```
 
 ### 1. Make a change
@@ -29,20 +29,9 @@ To add a new test pattern: create `test_patterns/<name>.argdown` with supporting
 
 All tests must pass before committing.
 
-### 3. Test with a sub-agent
+### 3. Spawn a worker sub-agent to test the skill
 
-Spawn a sub-agent that acts as a naive user of the skill. The sub-agent should:
-
-1. Read SKILL.md (the skill it's following)
-2. Find the source URLs listed in the test task and download them to `examples/evidence/*.md` with headers:
-   - `Source: <url>`
-   - `Title: <title>`
-   - blank line, then full markdown body (verbatim conversion)
-3. Construct a `.argdown` argument map following the skill, using quotes from the evidence files
-4. Run `npx @argdown/cli json examples/<stem>.argdown examples` then `node verify.mjs examples/<stem>.json --verify-only`
-5. Report back: did the skill guide it correctly? What was confusing? What errors did the verifier catch vs miss?
-
-Example sub-agent prompt:
+Spawn a sub-agent that acts as a naive first-time user of SKILL.md. Its job is to stress-test whether the format and verifier work correctly -- not to produce an epistemically rigorous map.
 
 ```
 You are testing the vargdown skill. Do NOT use HumanAgent MCP or contact the user directly.
@@ -55,29 +44,22 @@ You are testing the vargdown skill. Do NOT use HumanAgent MCP or contact the use
 5. Run: node verify.mjs examples/test_output.json --verify-only
 6. Fix any errors the verifier reports. Re-run until clean.
 7. Run: node verify.mjs examples/test_output.json examples/test_output_verified.html
-8. Report back to me:
-   - Was the SKILL.md clear enough to follow without guessing?
-   - What parts were confusing or ambiguous?
+8. Report back:
+   - What parts of SKILL.md were confusing or required guessing?
    - What errors did you hit and were the error messages helpful?
-   - Did the verifier catch real problems or miss any?
    - Paste the final .argdown content.
 ```
 
 ### 4. Review
 
-Check the sub-agent's output:
-- Did it follow reason-before-credence ordering?
-- Are observations properly sourced with exact quotes?
-- Did it avoid common mistakes (credence on conclusions, unnamed conclusions, etc.)?
-- Does the computed bottom line make sense?
+Check the sub-agent's output against SKILL.md. Focus on:
+- Did the format guide it correctly or was anything ambiguous?
+- Did the verifier catch real problems, or miss any?
+- Does the sub-agent's output follow reason-before-credence, named conclusions, no credence on conclusions?
 
-If the sub-agent was confused by something, that's a signal SKILL.md needs clarifying.
+If SKILL.md was ambiguous, make it precise. If the verifier missed something, fix verify.mjs.
 
-### 5. Address feedback
-
-Fix whatever the sub-agent flagged. If SKILL.md was ambiguous, make it precise. If the verifier missed something, fix verify.mjs. Then re-run the test.
-
-### 6. Commit
+### 5. Address feedback and commit
 
 ```bash
 npm test
